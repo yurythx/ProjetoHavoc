@@ -1,0 +1,72 @@
+{% extends 'base.html' %}
+
+{% block title %}Articles - Projeto Havoc{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <h1 class="h3 mb-0">
+                        <i class="fas fa-newspaper me-2"></i>
+                        Articles
+                    </h1>
+                </div>
+                <div class="card-body">
+                    <p class="lead">Bem-vindo ao módulo de artigos do Projeto Havoc!</p>
+
+                    <div class="alert alert-info">
+                        <i class="fas fa-info-circle me-2"></i>
+                        Este módulo está em desenvolvimento. Em breve você poderá criar, editar e gerenciar artigos.
+                    </div>
+
+                    <div class="row mt-4">
+                        <div class="col-md-4">
+                            <div class="card border-primary">
+                                <div class="card-body text-center">
+                                    <i class="fas fa-plus-circle fa-3x text-primary mb-3"></i>
+                                    <h5 class="card-title">Criar Artigo</h5>
+                                    <p class="card-text">Crie novos artigos para compartilhar conhecimento.</p>
+                                    <button class="btn btn-primary" disabled>
+                                        <i class="fas fa-plus me-1"></i>
+                                        Novo Artigo
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-md-4">
+                            <div class="card border-success">
+                                <div class="card-body text-center">
+                                    <i class="fas fa-list fa-3x text-success mb-3"></i>
+                                    <h5 class="card-title">Listar Artigos</h5>
+                                    <p class="card-text">Visualize todos os artigos publicados.</p>
+                                    <button class="btn btn-success" disabled>
+                                        <i class="fas fa-list me-1"></i>
+                                        Ver Artigos
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-md-4">
+                            <div class="card border-warning">
+                                <div class="card-body text-center">
+                                    <i class="fas fa-cog fa-3x text-warning mb-3"></i>
+                                    <h5 class="card-title">Configurações</h5>
+                                    <p class="card-text">Configure as opções do módulo de artigos.</p>
+                                    <button class="btn btn-warning" disabled>
+                                        <i class="fas fa-cog me-1"></i>
+                                        Configurar
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

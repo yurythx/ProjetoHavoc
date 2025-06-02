@@ -1,0 +1,769 @@
+/* ========================================
+   COMPONENTES DE AUTENTICAÇÃO
+   ======================================== */
+
+/* Estilos específicos para páginas de login */
+.login-card {
+    max-width: 450px;
+    margin: 0 auto;
+    border-radius: 10px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+    overflow: hidden;
+    background-color: white;
+}
+
+.login-header {
+    background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+    padding: 25px;
+    text-align: center;
+    color: white;
+    position: relative;
+}
+
+.login-icon {
+    font-size: 48px;
+    margin-bottom: 15px;
+    color: white;
+}
+
+.login-header h2 {
+    color: white;
+    margin-bottom: 10px;
+    font-size: 24px;
+}
+
+.login-header p {
+    opacity: 0.9;
+    margin: 0;
+}
+
+.login-body {
+    padding: 30px;
+}
+
+.login-form .form-group {
+    margin-bottom: 20px;
+}
+
+.login-form label {
+    font-weight: 500;
+    margin-bottom: 8px;
+    display: block;
+    color: #333;
+}
+
+.login-form label i {
+    color: var(--primary-color);
+    margin-right: 8px;
+    width: 20px;
+    text-align: center;
+}
+
+.login-input {
+    width: 100%;
+    height: 50px;
+    border-radius: 5px;
+    border: 1px solid #e1e5ee;
+    padding: 10px 15px;
+    font-size: 16px;
+    transition: all 0.3s;
+}
+
+.login-input:focus {
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 3px rgba(67, 97, 238, 0.15);
+    outline: none;
+}
+
+.login-input.input-error {
+    border-color: #e74c3c;
+    box-shadow: 0 0 0 3px rgba(231, 76, 60, 0.15);
+}
+
+.login-btn {
+    width: 100%;
+    height: 50px;
+    background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+    color: white;
+    border: none;
+    border-radius: 5px;
+    font-weight: 600;
+    font-size: 16px;
+    cursor: pointer;
+    transition: all 0.3s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.login-btn:hover {
+    background: linear-gradient(135deg, var(--secondary-color), var(--primary-color));
+    transform: translateY(-2px);
+    box-shadow: 0 7px 14px rgba(67, 97, 238, 0.2);
+}
+
+.login-btn i {
+    margin-right: 10px;
+}
+
+.login-footer {
+    padding: 20px 30px;
+    background: #f9fafc;
+    border-top: 1px solid #e1e5ee;
+}
+
+.auth-links {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.auth-link {
+    color: var(--primary-color);
+    text-decoration: none;
+    font-weight: 500;
+    transition: all 0.3s;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 0;
+}
+
+.auth-link i {
+    font-size: 16px;
+    width: 20px;
+    text-align: center;
+}
+
+.auth-link:hover {
+    color: var(--secondary-color);
+    transform: translateX(5px);
+}
+
+/* Caixa de informação */
+.info-box {
+    margin-top: 20px;
+    padding: 15px;
+    background-color: #f0f6fc;
+    border-left: 4px solid var(--primary-color);
+    border-radius: 5px;
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    margin-bottom: 20px;
+}
+
+.info-box i {
+    color: var(--primary-color);
+    font-size: 18px;
+    margin-top: 2px;
+}
+
+.info-box span {
+    font-size: 14px;
+    color: #333;
+    line-height: 1.5;
+}
+
+/* Opções de login social */
+.social-login {
+    margin-top: 5px;
+    text-align: center;
+}
+
+.alt-login-label {
+    text-align: center;
+    color: #6c757d;
+    margin-bottom: 15px;
+    font-size: 14px;
+}
+
+.social-buttons {
+    display: flex;
+    gap: 15px;
+    justify-content: center;
+}
+
+.social-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    color: white;
+    text-decoration: none;
+    font-size: 20px;
+    transition: all 0.3s;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.google-btn {
+    background-color: #DB4437;
+}
+
+.github-btn {
+    background-color: #333;
+}
+
+.ldap-btn-icon {
+    background-color: #0078d7;
+}
+
+.social-btn:hover {
+    transform: translateY(-3px) scale(1.05);
+    box-shadow: 0 7px 14px rgba(0, 0, 0, 0.15);
+}
+
+.social-btn:active {
+    transform: translateY(-1px);
+}
+
+/* Estilos para o campo de senha */
+.password-field {
+    position: relative;
+}
+
+.password-field .login-input {
+    padding-right: 45px; /* Espaço para o botão */
+}
+
+.password-toggle {
+    position: absolute !important;
+    right: 12px !important;
+    top: 50% !important;
+    transform: translateY(-50%) !important;
+    background: none !important;
+    border: none !important;
+    color: #6c757d !important;
+    cursor: pointer !important;
+    padding: 8px !important;
+    font-size: 16px !important;
+    transition: all 0.2s !important;
+    z-index: 1000 !important;
+    border-radius: 3px !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    width: 32px !important;
+    height: 32px !important;
+    outline: none !important;
+}
+
+.password-toggle:hover {
+    color: var(--primary-color);
+    background-color: rgba(67, 97, 238, 0.1);
+}
+
+.password-toggle:focus {
+    outline: 2px solid var(--primary-color);
+    outline-offset: 2px;
+}
+
+.password-toggle:active {
+    transform: translateY(-50%) scale(0.95);
+}
+
+/* Mensagens de erro */
+.form-error {
+    color: #e74c3c;
+    font-size: 14px;
+    margin-top: 5px;
+    padding: 8px 12px;
+    background: rgba(231, 76, 60, 0.08);
+    border-radius: 5px;
+    animation: shake 0.5s ease-in-out;
+}
+
+/* Animação de shake para erros */
+.shake {
+    animation: shake 0.5s cubic-bezier(.36,.07,.19,.97) both;
+}
+
+@keyframes shake {
+    10%, 90% { transform: translate3d(-1px, 0, 0); }
+    20%, 80% { transform: translate3d(2px, 0, 0); }
+    30%, 50%, 70% { transform: translate3d(-4px, 0, 0); }
+    40%, 60% { transform: translate3d(4px, 0, 0); }
+}
+
+/* ========================================
+   ESTILOS ESPECÍFICOS PARA LDAP LOGIN
+   ======================================== */
+
+.ldap-login-card {
+    max-width: 450px;
+    margin: 0 auto;
+    border-radius: 10px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+    overflow: hidden;
+    background-color: white;
+}
+
+.ldap-header {
+    background: linear-gradient(135deg, #0078d7, #106ebe);
+    padding: 25px;
+    text-align: center;
+    color: white;
+    position: relative;
+}
+
+.ldap-icon {
+    font-size: 48px;
+    margin-bottom: 15px;
+    color: white;
+}
+
+.ldap-header h2 {
+    color: white;
+    margin-bottom: 10px;
+    font-size: 24px;
+}
+
+.ldap-header p {
+    opacity: 0.9;
+    margin: 0 0 15px 0;
+}
+
+.ldap-badge {
+    display: inline-block;
+    background: rgba(255, 255, 255, 0.2);
+    padding: 5px 15px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+}
+
+.ldap-body {
+    padding: 30px;
+}
+
+.ldap-form .form-group {
+    margin-bottom: 20px;
+}
+
+.ldap-form label {
+    font-weight: 500;
+    margin-bottom: 8px;
+    display: block;
+    color: #333;
+}
+
+.ldap-form label i {
+    color: #0078d7;
+    margin-right: 8px;
+    width: 20px;
+    text-align: center;
+}
+
+.ldap-input {
+    width: 100%;
+    height: 50px;
+    border-radius: 5px;
+    border: 1px solid #e1e5ee;
+    padding: 10px 15px;
+    font-size: 16px;
+    transition: all 0.3s;
+}
+
+.ldap-input:focus {
+    border-color: #0078d7;
+    box-shadow: 0 0 0 3px rgba(0, 120, 215, 0.15);
+    outline: none;
+}
+
+.ldap-input.input-error {
+    border-color: #e74c3c;
+    box-shadow: 0 0 0 3px rgba(231, 76, 60, 0.15);
+}
+
+/* Estilos específicos para campo de senha LDAP */
+.ldap-form .password-field {
+    position: relative;
+}
+
+.ldap-form .password-field .ldap-input {
+    padding-right: 45px; /* Espaço para o botão */
+}
+
+.ldap-form .password-toggle {
+    position: absolute !important;
+    right: 12px !important;
+    top: 50% !important;
+    transform: translateY(-50%) !important;
+    background: none !important;
+    border: none !important;
+    color: #0078d7 !important;
+    cursor: pointer !important;
+    padding: 8px !important;
+    font-size: 16px !important;
+    transition: all 0.2s !important;
+    z-index: 1000 !important;
+    border-radius: 3px !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    width: 32px !important;
+    height: 32px !important;
+    outline: none !important;
+}
+
+.ldap-form .password-toggle:hover {
+    color: #106ebe;
+    background-color: rgba(0, 120, 215, 0.1);
+}
+
+.ldap-form .password-toggle:focus {
+    outline: 2px solid #0078d7;
+    outline-offset: 2px;
+}
+
+.ldap-btn {
+    width: 100%;
+    height: 50px;
+    background: linear-gradient(135deg, #0078d7, #106ebe);
+    color: white;
+    border: none;
+    border-radius: 5px;
+    font-weight: 600;
+    font-size: 16px;
+    cursor: pointer;
+    transition: all 0.3s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.ldap-btn:hover {
+    background: linear-gradient(135deg, #106ebe, #0078d7);
+    transform: translateY(-2px);
+    box-shadow: 0 7px 14px rgba(0, 120, 215, 0.2);
+}
+
+.ldap-btn i {
+    margin-right: 10px;
+}
+
+.ldap-footer {
+    padding: 20px 30px;
+    background: #f9fafc;
+    border-top: 1px solid #e1e5ee;
+}
+
+/* ========================================
+   ESTILOS PARA REGISTRO
+   ======================================== */
+
+.register-container {
+    max-width: 450px;
+    margin: 0 auto;
+    border-radius: 10px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+    overflow: hidden;
+    background-color: white;
+    padding: 30px;
+}
+
+.register-container h2 {
+    color: var(--primary-color);
+    margin-bottom: 10px;
+    font-size: 24px;
+    text-align: center;
+}
+
+.register-subtitle {
+    text-align: center;
+    color: #6c757d;
+    margin-bottom: 30px;
+}
+
+.register-form .form-group {
+    margin-bottom: 20px;
+}
+
+.register-form label {
+    font-weight: 500;
+    margin-bottom: 8px;
+    display: block;
+    color: #333;
+}
+
+.register-form label i {
+    color: var(--primary-color);
+    margin-right: 8px;
+    width: 20px;
+    text-align: center;
+}
+
+.register-form input {
+    width: 100%;
+    height: 50px;
+    border-radius: 5px;
+    border: 1px solid #e1e5ee;
+    padding: 10px 15px;
+    font-size: 16px;
+    transition: all 0.3s;
+}
+
+.register-form .password-field {
+    position: relative;
+}
+
+.register-form .password-field input {
+    padding-right: 45px; /* Espaço para o botão */
+}
+
+.register-form .password-toggle {
+    position: absolute !important;
+    right: 12px !important;
+    top: 50% !important;
+    transform: translateY(-50%) !important;
+    background: none !important;
+    border: none !important;
+    color: #6c757d !important;
+    cursor: pointer !important;
+    padding: 8px !important;
+    font-size: 16px !important;
+    transition: all 0.2s !important;
+    z-index: 1000 !important;
+    border-radius: 3px !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    width: 32px !important;
+    height: 32px !important;
+    outline: none !important;
+}
+
+.register-form .password-toggle:hover {
+    color: var(--primary-color);
+    background-color: rgba(67, 97, 238, 0.1);
+}
+
+.register-form .password-toggle:focus {
+    outline: 2px solid var(--primary-color);
+    outline-offset: 2px;
+}
+
+.register-form input:focus {
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 3px rgba(67, 97, 238, 0.15);
+    outline: none;
+}
+
+.register-form .btn {
+    width: 100%;
+    height: 50px;
+    background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+    color: white;
+    border: none;
+    border-radius: 5px;
+    font-weight: 600;
+    font-size: 16px;
+    cursor: pointer;
+    transition: all 0.3s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.register-form .btn:hover {
+    background: linear-gradient(135deg, var(--secondary-color), var(--primary-color));
+    transform: translateY(-2px);
+    box-shadow: 0 7px 14px rgba(67, 97, 238, 0.2);
+}
+
+.register-form .btn i {
+    margin-right: 10px;
+}
+
+.register-links {
+    text-align: center;
+    margin-top: 20px;
+    padding-top: 20px;
+    border-top: 1px solid #e1e5ee;
+}
+
+.register-links a {
+    color: var(--primary-color);
+    text-decoration: none;
+    font-weight: 500;
+}
+
+.register-links a:hover {
+    color: var(--secondary-color);
+}
+
+/* ========================================
+   ESTILOS PARA RESET DE SENHA
+   ======================================== */
+
+.password-reset-container {
+    max-width: 450px;
+    margin: 0 auto;
+    border-radius: 10px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+    overflow: hidden;
+    background-color: white;
+    padding: 30px;
+}
+
+.password-reset-container h2 {
+    color: var(--primary-color);
+    margin-bottom: 10px;
+    font-size: 24px;
+    text-align: center;
+}
+
+.reset-subtitle {
+    text-align: center;
+    color: #6c757d;
+    margin-bottom: 30px;
+    line-height: 1.5;
+}
+
+.reset-form .form-group {
+    margin-bottom: 20px;
+}
+
+.reset-form label {
+    font-weight: 500;
+    margin-bottom: 8px;
+    display: block;
+    color: #333;
+}
+
+.reset-form label i {
+    color: var(--primary-color);
+    margin-right: 8px;
+    width: 20px;
+    text-align: center;
+}
+
+.reset-form input {
+    width: 100%;
+    height: 50px;
+    border-radius: 5px;
+    border: 1px solid #e1e5ee;
+    padding: 10px 15px;
+    font-size: 16px;
+    transition: all 0.3s;
+}
+
+.reset-form input:focus {
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 3px rgba(67, 97, 238, 0.15);
+    outline: none;
+}
+
+.reset-form .btn {
+    width: 100%;
+    height: 50px;
+    background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+    color: white;
+    border: none;
+    border-radius: 5px;
+    font-weight: 600;
+    font-size: 16px;
+    cursor: pointer;
+    transition: all 0.3s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.reset-form .btn:hover {
+    background: linear-gradient(135deg, var(--secondary-color), var(--primary-color));
+    transform: translateY(-2px);
+    box-shadow: 0 7px 14px rgba(67, 97, 238, 0.2);
+}
+
+.reset-form .btn i {
+    margin-right: 10px;
+}
+
+/* ========================================
+   ESTILOS PARA CONFIRMAÇÃO DE RESET
+   ======================================== */
+
+.password-reset-done {
+    max-width: 450px;
+    margin: 0 auto;
+    border-radius: 10px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+    overflow: hidden;
+    background-color: white;
+    padding: 30px;
+    text-align: center;
+}
+
+.done-icon {
+    font-size: 64px;
+    color: #28a745;
+    margin-bottom: 20px;
+}
+
+.password-reset-done h2 {
+    color: var(--primary-color);
+    margin-bottom: 15px;
+    font-size: 24px;
+}
+
+.done-message {
+    color: #28a745;
+    font-weight: 500;
+    margin-bottom: 15px;
+    font-size: 18px;
+}
+
+.done-details {
+    color: #6c757d;
+    margin-bottom: 30px;
+    line-height: 1.5;
+}
+
+.done-actions .btn {
+    display: inline-block;
+    padding: 12px 30px;
+    background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+    color: white;
+    text-decoration: none;
+    border-radius: 5px;
+    font-weight: 600;
+    transition: all 0.3s;
+}
+
+.done-actions .btn:hover {
+    background: linear-gradient(135deg, var(--secondary-color), var(--primary-color));
+    transform: translateY(-2px);
+    box-shadow: 0 7px 14px rgba(67, 97, 238, 0.2);
+    color: white;
+}
+
+/* Responsividade */
+@media (max-width: 768px) {
+    .login-card,
+    .ldap-login-card,
+    .register-container,
+    .password-reset-container {
+        margin: 20px;
+        max-width: none;
+    }
+
+    .login-body,
+    .ldap-body {
+        padding: 20px;
+    }
+
+    .login-footer,
+    .ldap-footer {
+        padding: 15px 20px;
+    }
+
+    .register-container,
+    .password-reset-container {
+        padding: 20px;
+    }
+}

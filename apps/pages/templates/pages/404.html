@@ -1,0 +1,134 @@
+{% extends "base.html" %}
+
+{% block title %}Página Não Encontrada (404) - Viixen{% endblock %}
+
+{% block extra_css %}
+<style>
+.error-container {
+    min-height: 70vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+}
+
+.error-code {
+    font-size: 8rem;
+    font-weight: bold;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    line-height: 1;
+    margin-bottom: 20px;
+}
+
+.error-icon {
+    font-size: 120px;
+    color: #667eea;
+    opacity: 0.3;
+    margin-bottom: 30px;
+}
+
+.btn-home {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    border: none;
+    padding: 12px 30px;
+    border-radius: 25px;
+    color: white;
+    text-decoration: none;
+    transition: all 0.3s ease;
+    display: inline-block;
+}
+
+.btn-home:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+    color: white;
+}
+
+.suggestions {
+    background: white;
+    border-radius: 15px;
+    padding: 30px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+    margin-top: 40px;
+}
+
+.suggestion-link {
+    color: #667eea;
+    text-decoration: none;
+    transition: color 0.3s ease;
+}
+
+.suggestion-link:hover {
+    color: #764ba2;
+}
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="error-container">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-lg-8">
+                <div class="error-icon">
+                    <i class="fas fa-search"></i>
+                </div>
+                <div class="error-code">404</div>
+                <h1 class="display-5 fw-bold mb-4">Página Não Encontrada</h1>
+                <p class="lead text-muted mb-4">
+                    Ops! A página que você está procurando não existe ou foi movida para outro local.
+                </p>
+
+                <div class="mb-4">
+                    <a href="{% url 'pages:home' %}" class="btn-home me-3">
+                        <i class="fas fa-home me-2"></i>Voltar ao Início
+                    </a>
+                    <a href="javascript:history.back()" class="btn btn-outline-secondary">
+                        <i class="fas fa-arrow-left me-2"></i>Página Anterior
+                    </a>
+                </div>
+
+                <div class="suggestions">
+                    <h5 class="mb-3">Talvez você esteja procurando por:</h5>
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <div class="d-flex align-items-center">
+                                <i class="fas fa-home text-primary me-2"></i>
+                                <a href="{% url 'pages:home' %}" class="suggestion-link">Página Inicial</a>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="d-flex align-items-center">
+                                <i class="fas fa-info-circle text-primary me-2"></i>
+                                <a href="{% url 'pages:sobre' %}" class="suggestion-link">Sobre Nós</a>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="d-flex align-items-center">
+                                <i class="fas fa-envelope text-primary me-2"></i>
+                                <a href="{% url 'pages:contato' %}" class="suggestion-link">Contato</a>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="d-flex align-items-center">
+                                <i class="fas fa-sign-in-alt text-primary me-2"></i>
+                                <a href="{% url 'accounts:login' %}" class="suggestion-link">Fazer Login</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="mt-4">
+                    <p class="text-muted small">
+                        Se você acredita que isso é um erro, por favor
+                        <a href="{% url 'pages:contato' %}" class="suggestion-link">entre em contato conosco</a>.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

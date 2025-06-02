@@ -1,0 +1,264 @@
+{% extends "config/base_config.html" %}
+
+{% block config_title %}Backup e Restauração{% endblock %}
+{% block config_description %}Gerencie backups das configurações do sistema{% endblock %}
+
+{% block config_content %}
+
+<!-- Estatísticas -->
+<div class="row mb-4">
+    <div class="col-md-3">
+        <div class="card bg-primary text-white">
+            <div class="card-body text-center">
+                <h5 class="card-title">Total de Backups</h5>
+                <h2 class="display-4">{{ backups|length }}</h2>
+                <p class="mb-0">backup{{ backups|length|pluralize:",s" }} criado{{ backups|length|pluralize:",s" }}</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card bg-success text-white">
+            <div class="card-body text-center">
+                <h5 class="card-title">Backups Protegidos</h5>
+                <h2 class="display-4">{{ backups|length|add:0 }}</h2>
+                <p class="mb-0">backup{{ backups|length|pluralize:",s" }} protegido{{ backups|length|pluralize:",s" }}</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card bg-info text-white">
+            <div class="card-body text-center">
+                <h5 class="card-title">Último Backup</h5>
+                {% if backups %}
+                    <h6 class="display-6">{{ backups.0.created_at|date:"d/m/Y" }}</h6>
+                    <p class="mb-0">{{ backups.0.created_at|date:"H:i" }}</p>
+                {% else %}
+                    <h6 class="display-6">-</h6>
+                    <p class="mb-0">Nenhum backup</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card bg-warning text-dark">
+            <div class="card-body text-center">
+                <h5 class="card-title">Tamanho Total</h5>
+                <h6 class="display-6">
+                    {% if backups %}
+                        ~{{ backups|length|add:0 }}MB
+                    {% else %}
+                        0MB
+                    {% endif %}
+                </h6>
+                <p class="mb-0">espaço utilizado</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Ações -->
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <h4>Lista de Backups</h4>
+    <div>
+        <button type="button" class="btn btn-success" data-bs-toggle="modal" data-bs-target="#createBackupModal">
+            <i class="fas fa-plus"></i> Criar Backup
+        </button>
+    </div>
+</div>
+
+<!-- Lista de Backups -->
+{% if backups %}
+    <div class="card">
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-hover">
+                    <thead class="table-light">
+                        <tr>
+                            <th>Nome</th>
+                            <th>Tipo</th>
+                            <th>Criado por</th>
+                            <th>Data/Hora</th>
+                            <th>Tamanho</th>
+                            <th>Status</th>
+                            <th>Ações</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for backup in backups %}
+                            <tr>
+                                <td>
+                                    <strong>{{ backup.name }}</strong>
+                                    {% if backup.description %}
+                                        <br><small class="text-muted">{{ backup.description|truncatewords:10 }}</small>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    <span class="badge bg-{% if backup.backup_type == 'manual' %}primary{% elif backup.backup_type == 'automatic' %}success{% elif backup.backup_type == 'scheduled' %}info{% else %}secondary{% endif %}">
+                                        {{ backup.get_backup_type_display }}
+                                    </span>
+                                </td>
+                                <td>
+                                    {% if backup.created_by %}
+                                        <i class="fas fa-user me-1"></i>{{ backup.created_by.username }}
+                                    {% else %}
+                                        <span class="text-muted">Sistema</span>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    <div>{{ backup.created_at|date:"d/m/Y" }}</div>
+                                    <small class="text-muted">{{ backup.created_at|date:"H:i:s" }}</small>
+                                </td>
+                                <td>
+                                    <span class="badge bg-light text-dark">{{ backup.get_size_display }}</span>
+                                </td>
+                                <td>
+                                    {% if backup.is_protected %}
+                                        <span class="badge bg-warning text-dark">
+                                            <i class="fas fa-shield-alt"></i> Protegido
+                                        </span>
+                                    {% else %}
+                                        <span class="badge bg-secondary">Normal</span>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    <div class="btn-group btn-group-sm">
+                                        <a href="{% url 'config:backup-download' backup.pk %}" class="btn btn-outline-primary" title="Download">
+                                            <i class="fas fa-download"></i>
+                                        </a>
+                                        {% if not backup.is_protected %}
+                                            <button type="button" class="btn btn-outline-danger" title="Excluir" onclick="confirmDelete({{ backup.id }}, '{{ backup.name }}')">
+                                                <i class="fas fa-trash"></i>
+                                            </button>
+                                        {% endif %}
+                                    </div>
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- Paginação -->
+    {% if is_paginated %}
+        <nav aria-label="Paginação de backups" class="mt-3">
+            <ul class="pagination justify-content-center">
+                {% if page_obj.has_previous %}
+                    <li class="page-item">
+                        <a class="page-link" href="?page=1">Primeira</a>
+                    </li>
+                    <li class="page-item">
+                        <a class="page-link" href="?page={{ page_obj.previous_page_number }}">Anterior</a>
+                    </li>
+                {% endif %}
+
+                <li class="page-item active">
+                    <span class="page-link">{{ page_obj.number }} de {{ page_obj.paginator.num_pages }}</span>
+                </li>
+
+                {% if page_obj.has_next %}
+                    <li class="page-item">
+                        <a class="page-link" href="?page={{ page_obj.next_page_number }}">Próxima</a>
+                    </li>
+                    <li class="page-item">
+                        <a class="page-link" href="?page={{ page_obj.paginator.num_pages }}">Última</a>
+                    </li>
+                {% endif %}
+            </ul>
+        </nav>
+    {% endif %}
+
+{% else %}
+    <div class="text-center py-5">
+        <i class="fas fa-archive fa-3x text-muted mb-3"></i>
+        <h4>Nenhum backup encontrado</h4>
+        <p class="text-muted">Crie seu primeiro backup para proteger as configurações do sistema.</p>
+        <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#createBackupModal">
+            <i class="fas fa-plus"></i> Criar Primeiro Backup
+        </button>
+    </div>
+{% endif %}
+
+<!-- Modal para Criar Backup -->
+<div class="modal fade" id="createBackupModal" tabindex="-1" aria-labelledby="createBackupModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="createBackupModalLabel">
+                    <i class="fas fa-plus"></i> Criar Novo Backup
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form method="post" action="{% url 'config:backup-create' %}">
+                <div class="modal-body">
+                    {% csrf_token %}
+                    <div class="mb-3">
+                        <label for="backupName" class="form-label">Nome do Backup</label>
+                        <input type="text" class="form-control" id="backupName" name="name" 
+                               value="Backup {{ 'now'|date:'d/m/Y H:i' }}" required>
+                        <div class="form-text">Nome identificador para este backup</div>
+                    </div>
+                    <div class="mb-3">
+                        <label for="backupDescription" class="form-label">Descrição (Opcional)</label>
+                        <textarea class="form-control" id="backupDescription" name="description" rows="3"
+                                  placeholder="Descreva o motivo ou contexto deste backup..."></textarea>
+                    </div>
+                    
+                    <div class="alert alert-info">
+                        <h6><i class="fas fa-info-circle"></i> O que será incluído no backup:</h6>
+                        <ul class="mb-0 small">
+                            <li>Configurações do sistema</li>
+                            <li>Configurações de aplicativos</li>
+                            <li>Variáveis de ambiente</li>
+                            <li>Configurações de banco de dados</li>
+                            <li>Configurações LDAP e email</li>
+                            <li>Widgets, menus e plugins</li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="submit" class="btn btn-success">
+                        <i class="fas fa-save"></i> Criar Backup
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+{% endblock %}
+
+{% block extra_js %}
+<script>
+function confirmDelete(backupId, backupName) {
+    if (confirm(`Tem certeza que deseja excluir o backup "${backupName}"?\n\nEsta ação não pode ser desfeita.`)) {
+        // Criar formulário para exclusão
+        const form = document.createElement('form');
+        form.method = 'POST';
+        form.action = `/config/backups/${backupId}/delete/`;
+        
+        const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]').value;
+        const csrfInput = document.createElement('input');
+        csrfInput.type = 'hidden';
+        csrfInput.name = 'csrfmiddlewaretoken';
+        csrfInput.value = csrfToken;
+        
+        form.appendChild(csrfInput);
+        document.body.appendChild(form);
+        form.submit();
+    }
+}
+
+document.addEventListener('DOMContentLoaded', function() {
+    // Auto-gerar nome do backup com timestamp
+    const nameInput = document.getElementById('backupName');
+    if (nameInput) {
+        const now = new Date();
+        const timestamp = now.toLocaleString('pt-BR');
+        nameInput.value = `Backup ${timestamp}`;
+    }
+});
+</script>
+{% endblock %}

@@ -1,0 +1,570 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Detalhes do Usuário - {{ user_obj.username }}{% endblock %}
+
+{% block extra_css %}
+<style>
+
+    .info-card {
+        background: #f8f9fa;
+        border-radius: 0.375rem;
+        padding: 1.5rem;
+        margin-bottom: 1.5rem;
+        border-left: 4px solid #007bff;
+    }
+    .info-card h5 {
+        color: #495057;
+        margin-bottom: 1rem;
+    }
+    .info-item {
+        margin-bottom: 1rem;
+    }
+    .info-label {
+        font-weight: 600;
+        color: #6c757d;
+        margin-bottom: 0.25rem;
+    }
+    .info-value {
+        color: #495057;
+    }
+    .status-badge {
+        font-size: 0.9rem;
+        padding: 0.5rem 1rem;
+    }
+    .activity-timeline {
+        border-left: 2px solid #dee2e6;
+        padding-left: 1rem;
+        margin-left: 0.5rem;
+    }
+    .activity-item {
+        position: relative;
+        padding-bottom: 1rem;
+    }
+    .activity-item::before {
+        content: '';
+        position: absolute;
+        left: -1.375rem;
+        top: 0.25rem;
+        width: 0.75rem;
+        height: 0.75rem;
+        background: #007bff;
+        border-radius: 50%;
+        border: 2px solid white;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <h1 class="mb-4">Detalhes do Usuário</h1>
+
+    <!-- Informações do Usuário -->
+    <div class="card mb-4">
+        <div class="card-header d-flex align-items-center justify-content-between">
+            <h2 class="h5 mb-0">
+                <i class="fas fa-user me-2"></i>
+                Informações do Usuário
+            </h2>
+            <div class="d-flex gap-2">
+                <a href="{% url 'accounts:user_edit' user_obj.pk %}" class="btn btn-sm btn-primary">
+                    <i class="fas fa-edit me-1"></i>Editar
+                </a>
+                <a href="{% url 'accounts:user_list' %}" class="btn btn-sm btn-outline-secondary">
+                    <i class="fas fa-arrow-left me-1"></i>Voltar
+                </a>
+            </div>
+        </div>
+        <div class="card-body">
+            <div class="row">
+                <!-- Avatar -->
+                <div class="col-md-3 text-center mb-4 mb-md-0">
+                    <div class="user-avatar-lg rounded-circle mx-auto mb-3 d-flex align-items-center justify-content-center {% if not user_obj.avatar %}bg-primary{% endif %}" style="width: 150px; height: 150px;">
+                        {% if user_obj.avatar %}
+                            <img src="{{ user_obj.avatar.url }}" alt="Avatar de {{ user_obj.get_full_name|default:user_obj.username }}" class="rounded-circle img-thumbnail" style="width: 150px; height: 150px; object-fit: cover;">
+                        {% else %}
+                            <i class="fas fa-user text-white fa-3x"></i>
+                        {% endif %}
+                    </div>
+
+                    {% if user_obj.is_active %}
+                        <span class="badge bg-success">
+                            <i class="fas fa-check-circle me-1"></i>Ativo
+                        </span>
+                    {% else %}
+                        <span class="badge bg-danger">
+                            <i class="fas fa-times-circle me-1"></i>Inativo
+                        </span>
+                    {% endif %}
+                </div>
+
+                <!-- Informações -->
+                <div class="col-md-9">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label class="form-label">
+                                    <i class="fas fa-user-tag text-primary me-2"></i>Nome de Usuário
+                                </label>
+                                <div class="form-control-plaintext">{{ user_obj.username }}</div>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">
+                                    <i class="fas fa-envelope text-primary me-2"></i>Email
+                                </label>
+                                <div class="form-control-plaintext">{{ user_obj.email }}</div>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">
+                                    <i class="fas fa-user text-primary me-2"></i>Nome Completo
+                                </label>
+                                <div class="form-control-plaintext">
+                                    {% if user_obj.get_full_name %}
+                                        {{ user_obj.get_full_name }}
+                                    {% else %}
+                                        <span class="text-muted">Não informado</span>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label class="form-label">
+                                    <i class="fas fa-phone text-primary me-2"></i>Telefone
+                                </label>
+                                <div class="form-control-plaintext">
+                                    {% if user_obj.telefone %}
+                                        {{ user_obj.telefone }}
+                                    {% else %}
+                                        <span class="text-muted">Não informado</span>
+                                    {% endif %}
+                                </div>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">
+                                    <i class="fas fa-birthday-cake text-primary me-2"></i>Data de Nascimento
+                                </label>
+                                <div class="form-control-plaintext">
+                                    {% if user_obj.data_nascimento %}
+                                        {{ user_obj.data_nascimento|date:"d/m/Y" }}
+                                    {% else %}
+                                        <span class="text-muted">Não informado</span>
+                                    {% endif %}
+                                </div>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">
+                                    <i class="fas fa-user-tie text-primary me-2"></i>Cargo
+                                </label>
+                                <div class="form-control-plaintext">
+                                    {% if user_obj.cargo %}
+                                        {{ user_obj.cargo }}
+                                    {% else %}
+                                        <span class="text-muted">Não informado</span>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Biografia -->
+    <div class="card mb-4">
+        <div class="card-header">
+            <h2 class="h5 mb-0">
+                <i class="fas fa-comment-alt me-2"></i>
+                Sobre o Usuário
+            </h2>
+        </div>
+        <div class="card-body">
+            <div class="mb-3">
+                <label class="form-label">
+                    <i class="fas fa-building text-primary me-2"></i>Departamento
+                </label>
+                <div class="form-control-plaintext">
+                    {% if user_obj.departamento %}
+                        {{ user_obj.departamento }}
+                    {% else %}
+                        <span class="text-muted">Não informado</span>
+                    {% endif %}
+                </div>
+            </div>
+            <div class="mb-3">
+                <label class="form-label">Biografia</label>
+                <div class="form-control-plaintext">
+                    {% if user_obj.bio %}
+                        {{ user_obj.bio }}
+                    {% else %}
+                        <span class="text-muted">Não informado</span>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Grupos e Permissões -->
+    <div class="card mb-4">
+        <div class="card-header">
+            <h2 class="h5 mb-0">
+                <i class="fas fa-users-cog me-2"></i>
+                Grupos e Permissões
+            </h2>
+        </div>
+        <div class="card-body">
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="mb-3">
+                        <label class="form-label">
+                            <i class="fas fa-users text-primary me-2"></i>Grupos
+                        </label>
+                        <div class="form-control-plaintext">
+                            {% for group in user_obj.groups.all %}
+                                <span class="badge bg-secondary me-1">{{ group.name }}</span>
+                            {% empty %}
+                                <span class="text-muted">Nenhum grupo</span>
+                            {% endfor %}
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="mb-3">
+                        <label class="form-label">
+                            <i class="fas fa-shield-alt text-primary me-2"></i>Permissões Especiais
+                        </label>
+                        <div class="form-control-plaintext">
+                            {% if user_obj.is_superuser %}
+                                <span class="badge bg-danger me-1">Superusuário</span>
+                            {% endif %}
+                            {% if user_obj.is_staff %}
+                                <span class="badge bg-warning me-1">Staff</span>
+                            {% endif %}
+                            {% if not user_obj.is_superuser and not user_obj.is_staff %}
+                                <span class="text-muted">Usuário comum</span>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Atividade e Estatísticas -->
+    <div class="card mb-4">
+        <div class="card-header">
+            <h2 class="h5 mb-0">
+                <i class="fas fa-clock me-2"></i>
+                Atividade e Estatísticas
+            </h2>
+        </div>
+        <div class="card-body">
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="mb-3">
+                        <label class="form-label">
+                            <i class="fas fa-sign-in-alt text-primary me-2"></i>Último Login
+                        </label>
+                        <div class="form-control-plaintext">
+                            {% if user_obj.last_login %}
+                                {{ user_obj.last_login|date:"d/m/Y H:i" }}
+                            {% else %}
+                                <span class="text-muted">Nunca fez login</span>
+                            {% endif %}
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">
+                            <i class="fas fa-calendar-plus text-primary me-2"></i>Data de Criação
+                        </label>
+                        <div class="form-control-plaintext">{{ user_obj.date_joined|date:"d/m/Y H:i" }}</div>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="mb-3">
+                        <label class="form-label">
+                            <i class="fas fa-users text-primary me-2"></i>Total de Grupos
+                        </label>
+                        <div class="form-control-plaintext">
+                            <span class="badge bg-info">{{ user_obj.groups.count }}</span>
+                        </div>
+                    </div>
+                    {% if user_obj.email_verificado %}
+                    <div class="mb-3">
+                        <label class="form-label">
+                            <i class="fas fa-envelope-check text-primary me-2"></i>Email Verificado
+                        </label>
+                        <div class="form-control-plaintext">
+                            <span class="badge bg-success">Verificado</span>
+                        </div>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Ações -->
+    <div class="card mb-4">
+        <div class="card-header">
+            <h2 class="h5 mb-0">
+                <i class="fas fa-cogs me-2"></i>
+                Ações do Usuário
+            </h2>
+        </div>
+        <div class="card-body">
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="d-flex align-items-center p-3 border rounded mb-3">
+                        <div class="me-3">
+                            <i class="fas fa-edit text-primary fa-2x"></i>
+                        </div>
+                        <div class="flex-grow-1">
+                            <h6 class="mb-2">Editar Usuário</h6>
+                            <p class="text-muted small mb-2">Modificar informações do usuário</p>
+                            <a href="{% url 'accounts:user_edit' user_obj.pk %}" class="btn btn-sm btn-outline-primary">
+                                <i class="fas fa-edit me-1"></i>Editar
+                            </a>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    {% if not user_obj.is_superuser %}
+                    <div class="d-flex align-items-center p-3 border rounded mb-3">
+                        <div class="me-3">
+                            <i class="fas fa-{% if user_obj.is_active %}pause{% else %}play{% endif %} text-warning fa-2x"></i>
+                        </div>
+                        <div class="flex-grow-1">
+                            <h6 class="mb-2">{% if user_obj.is_active %}Desativar{% else %}Ativar{% endif %} Usuário</h6>
+                            <p class="text-muted small mb-2">Alterar status do usuário</p>
+                            <button type="button" class="btn btn-sm btn-outline-warning"
+                                    onclick="toggleUserStatus({{ user_obj.pk }}, {{ user_obj.is_active|yesno:'true,false' }})">
+                                <i class="fas fa-{% if user_obj.is_active %}pause{% else %}play{% endif %} me-1"></i>
+                                {% if user_obj.is_active %}Desativar{% else %}Ativar{% endif %}
+                            </button>
+                        </div>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+
+            {% if not user_obj.is_superuser %}
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="d-flex align-items-center p-3 border rounded mb-3">
+                        <div class="me-3">
+                            <i class="fas fa-trash text-danger fa-2x"></i>
+                        </div>
+                        <div class="flex-grow-1">
+                            <h6 class="mb-2">Deletar Usuário</h6>
+                            <p class="text-muted small mb-2">Remover usuário permanentemente</p>
+                            <button type="button" class="btn btn-sm btn-outline-danger"
+                                    onclick="showDeleteUserModal({{ user_obj.pk }}, '{{ user_obj.get_full_name|default:user_obj.username|escapejs }}', '{{ user_obj.username|escapejs }}', '{{ user_obj.email|escapejs }}')">
+                                <i class="fas fa-trash me-1"></i>Deletar
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="d-flex align-items-center p-3 border rounded mb-3">
+                        <div class="me-3">
+                            <i class="fas fa-list text-secondary fa-2x"></i>
+                        </div>
+                        <div class="flex-grow-1">
+                            <h6 class="mb-2">Lista de Usuários</h6>
+                            <p class="text-muted small mb-2">Voltar para a lista completa</p>
+                            <a href="{% url 'accounts:user_list' %}" class="btn btn-sm btn-outline-secondary">
+                                <i class="fas fa-list me-1"></i>Ver Lista
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<!-- Modal de Confirmação de Exclusão -->
+<div class="modal fade" id="deleteUserModal" tabindex="-1" aria-labelledby="deleteUserModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <form method="post" id="deleteUserForm">
+                {% csrf_token %}
+                <div class="modal-header bg-danger text-white">
+                    <h5 class="modal-title" id="deleteUserModalLabel">
+                        <i class="fas fa-exclamation-triangle me-2"></i>
+                        Confirmar Exclusão
+                    </h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="text-center mb-4">
+                        <i class="fas fa-user-times fa-3x text-danger mb-3"></i>
+                        <h6 class="text-danger">Atenção: Esta ação é irreversível!</h6>
+                    </div>
+
+                    <div class="alert alert-warning">
+                        <i class="fas fa-exclamation-triangle me-2"></i>
+                        <strong>Você está prestes a deletar permanentemente este usuário.</strong>
+                        <br><small>Todos os dados associados a este usuário serão perdidos.</small>
+                    </div>
+
+                    <div class="user-info bg-light p-3 rounded">
+                        <h6 class="mb-2">
+                            <i class="fas fa-user me-2"></i>
+                            Usuário a ser deletado:
+                        </h6>
+                        <div class="row">
+                            <div class="col-sm-4"><strong>Nome:</strong></div>
+                            <div class="col-sm-8" id="deleteUserName">-</div>
+                        </div>
+                        <div class="row">
+                            <div class="col-sm-4"><strong>Username:</strong></div>
+                            <div class="col-sm-8" id="deleteUserUsername">-</div>
+                        </div>
+                        <div class="row">
+                            <div class="col-sm-4"><strong>Email:</strong></div>
+                            <div class="col-sm-8" id="deleteUserEmail">-</div>
+                        </div>
+                    </div>
+
+                    <div class="mt-3">
+                        <label for="confirmDeleteInput" class="form-label">
+                            <strong>Para confirmar, digite "DELETAR" abaixo:</strong>
+                        </label>
+                        <input type="text"
+                               class="form-control"
+                               id="confirmDeleteInput"
+                               placeholder="Digite DELETAR para confirmar"
+                               autocomplete="off">
+                        <div class="form-text text-danger">
+                            <i class="fas fa-info-circle me-1"></i>
+                            Digite exatamente "DELETAR" (sem aspas) para habilitar o botão de exclusão.
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                        <i class="fas fa-times me-1"></i>Cancelar
+                    </button>
+                    <button type="submit"
+                            class="btn btn-danger"
+                            id="confirmDeleteBtn"
+                            disabled>
+                        <i class="fas fa-trash me-1"></i>Deletar Usuário
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+/**
+ * Mostrar modal de confirmação de exclusão
+ */
+function showDeleteUserModal(userId, fullName, username, email) {
+    console.log('showDeleteUserModal chamada com:', userId, fullName, username, email);
+
+    // Preencher informações do usuário no modal
+    document.getElementById('deleteUserName').textContent = fullName;
+    document.getElementById('deleteUserUsername').textContent = username;
+    document.getElementById('deleteUserEmail').textContent = email;
+
+    // Configurar action do formulário
+    const form = document.getElementById('deleteUserForm');
+    form.action = `{% url 'accounts:user_delete' 0 %}`.replace('0', userId);
+
+    console.log('Form action configurada para:', form.action);
+
+    // Mostrar modal
+    const modal = new bootstrap.Modal(document.getElementById('deleteUserModal'));
+    modal.show();
+
+    // Focar no campo de confirmação após um pequeno delay
+    setTimeout(() => {
+        document.getElementById('confirmDeleteInput').focus();
+    }, 500);
+}
+
+// Tornar função disponível globalmente
+window.showDeleteUserModal = showDeleteUserModal;
+
+function toggleUserStatus(userId, currentStatus) {
+    const action = currentStatus ? 'desativar' : 'ativar';
+
+    if (confirm(`Tem certeza que deseja ${action} este usuário?`)) {
+        fetch(`/accounts/users/${userId}/toggle-status/`, {
+            method: 'POST',
+            headers: {
+                'X-CSRFToken': getCookie('csrftoken'),
+                'Content-Type': 'application/json',
+            },
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                location.reload();
+            } else {
+                alert(data.message || 'Erro ao alterar status do usuário');
+            }
+        })
+        .catch(error => {
+            console.error('Erro:', error);
+            alert('Erro ao alterar status do usuário');
+        });
+    }
+}
+
+function getCookie(name) {
+    let cookieValue = null;
+    if (document.cookie && document.cookie !== '') {
+        const cookies = document.cookie.split(';');
+        for (let i = 0; i < cookies.length; i++) {
+            const cookie = cookies[i].trim();
+            if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                break;
+            }
+        }
+    }
+    return cookieValue;
+}
+
+document.addEventListener('DOMContentLoaded', function() {
+    console.log('DOM carregado - configurando modal de exclusão');
+
+    // Configurar validação do campo de confirmação
+    const confirmInput = document.getElementById('confirmDeleteInput');
+    const confirmBtn = document.getElementById('confirmDeleteBtn');
+
+    if (confirmInput && confirmBtn) {
+        console.log('Configurando validação do campo DELETAR');
+
+        confirmInput.addEventListener('input', function() {
+            const isValid = this.value.trim() === 'DELETAR';
+            confirmBtn.disabled = !isValid;
+
+            if (isValid) {
+                confirmBtn.innerHTML = '<i class="fas fa-trash me-1"></i>Deletar Usuário';
+            } else {
+                confirmBtn.innerHTML = '<i class="fas fa-lock me-1"></i>Digite DELETAR para confirmar';
+            }
+        });
+
+        // Limpar campo quando modal é fechado
+        document.getElementById('deleteUserModal').addEventListener('hidden.bs.modal', function() {
+            confirmInput.value = '';
+            confirmBtn.disabled = true;
+            confirmBtn.innerHTML = '<i class="fas fa-lock me-1"></i>Digite DELETAR para confirmar';
+        });
+    } else {
+        console.log('Elementos do modal não encontrados');
+    }
+});
+</script>
+{% endblock %}
+
+

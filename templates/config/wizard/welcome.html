@@ -1,0 +1,287 @@
+{% extends "config/wizard/base_wizard.html" %}
+{% load static %}
+
+{% block wizard_content %}
+<form id="wizard-form" method="post" action="{% url 'config:wizard_step' wizard.wizard_id 'welcome' %}">
+    {% csrf_token %}
+    
+    <div class="row">
+        <div class="col-lg-8 mx-auto">
+            <!-- Boas-vindas -->
+            <div class="text-center mb-5">
+                <div class="mb-4">
+                    <i class="fas fa-magic text-primary" style="font-size: 4rem;"></i>
+                </div>
+                <h2 class="text-primary">Bem-vindo ao Projeto Havoc!</h2>
+                <p class="lead text-muted">
+                    Este assistente irá guiá-lo através da configuração inicial do seu sistema.
+                    Vamos detectar seu ambiente, configurar componentes essenciais e otimizar 
+                    o desempenho para suas necessidades específicas.
+                </p>
+            </div>
+
+            <!-- Status do Sistema -->
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5 class="mb-0">
+                        <i class="fas fa-info-circle text-info me-2"></i>
+                        Status Atual do Sistema
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="d-flex align-items-center mb-3">
+                                <i class="fas fa-cog text-primary me-3"></i>
+                                <div>
+                                    <strong>Sistema:</strong><br>
+                                    <span class="text-muted">
+                                        {% if system_config %}
+                                            {{ system_config.site_name }}
+                                        {% else %}
+                                            Não configurado
+                                        {% endif %}
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="d-flex align-items-center mb-3">
+                                <i class="fas fa-database text-success me-3"></i>
+                                <div>
+                                    <strong>Banco de Dados:</strong><br>
+                                    <span class="text-muted">Conectado</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="d-flex align-items-center mb-3">
+                                <i class="fas fa-shield-alt text-warning me-3"></i>
+                                <div>
+                                    <strong>Modo Debug:</strong><br>
+                                    <span class="badge bg-{% if system_config.debug_mode %}warning{% else %}success{% endif %}">
+                                        {% if system_config.debug_mode %}Ativo{% else %}Inativo{% endif %}
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="d-flex align-items-center mb-3">
+                                <i class="fas fa-users text-info me-3"></i>
+                                <div>
+                                    <strong>Registro:</strong><br>
+                                    <span class="badge bg-{% if system_config.allow_registration %}success{% else %}secondary{% endif %}">
+                                        {% if system_config.allow_registration %}Permitido{% else %}Bloqueado{% endif %}
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- O que será configurado -->
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5 class="mb-0">
+                        <i class="fas fa-list-check text-success me-2"></i>
+                        O que será configurado
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <ul class="list-unstyled">
+                                <li class="mb-2">
+                                    <i class="fas fa-search text-primary me-2"></i>
+                                    <strong>Detecção de Ambiente</strong><br>
+                                    <small class="text-muted">Análise automática do seu ambiente de execução</small>
+                                </li>
+                                <li class="mb-2">
+                                    <i class="fas fa-database text-primary me-2"></i>
+                                    <strong>Banco de Dados</strong><br>
+                                    <small class="text-muted">Configuração e otimização da conexão</small>
+                                </li>
+                                <li class="mb-2">
+                                    <i class="fas fa-envelope text-primary me-2"></i>
+                                    <strong>Sistema de Email</strong><br>
+                                    <small class="text-muted">Configuração do servidor SMTP</small>
+                                </li>
+                            </ul>
+                        </div>
+                        <div class="col-md-6">
+                            <ul class="list-unstyled">
+                                <li class="mb-2">
+                                    <i class="fas fa-shield-alt text-primary me-2"></i>
+                                    <strong>Segurança</strong><br>
+                                    <small class="text-muted">Configurações de segurança essenciais</small>
+                                </li>
+                                <li class="mb-2">
+                                    <i class="fas fa-rocket text-primary me-2"></i>
+                                    <strong>Otimizações</strong><br>
+                                    <small class="text-muted">Melhorias de performance e cache</small>
+                                </li>
+                                <li class="mb-2">
+                                    <i class="fas fa-check-circle text-primary me-2"></i>
+                                    <strong>Finalização</strong><br>
+                                    <small class="text-muted">Aplicação das configurações escolhidas</small>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Preferências do Assistente -->
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5 class="mb-0">
+                        <i class="fas fa-sliders-h text-warning me-2"></i>
+                        Preferências do Assistente
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-12">
+                            <div class="form-check mb-3">
+                                <input class="form-check-input" type="checkbox" id="auto_apply" name="auto_apply" checked>
+                                <label class="form-check-label" for="auto_apply">
+                                    <strong>Aplicar recomendações automaticamente</strong><br>
+                                    <small class="text-muted">
+                                        Aplicar automaticamente recomendações de segurança e performance quando possível
+                                    </small>
+                                </label>
+                            </div>
+                            
+                            <div class="form-check mb-3">
+                                <input class="form-check-input" type="checkbox" id="skip_optional" name="skip_optional">
+                                <label class="form-check-label" for="skip_optional">
+                                    <strong>Pular etapas opcionais</strong><br>
+                                    <small class="text-muted">
+                                        Pular configurações não essenciais para uma configuração mais rápida
+                                    </small>
+                                </label>
+                            </div>
+                            
+                            <div class="form-check mb-3">
+                                <input class="form-check-input" type="checkbox" id="create_backup" name="create_backup" checked>
+                                <label class="form-check-label" for="create_backup">
+                                    <strong>Criar backup antes das alterações</strong><br>
+                                    <small class="text-muted">
+                                        Criar um backup das configurações atuais antes de aplicar mudanças
+                                    </small>
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Tempo Estimado -->
+            <div class="alert alert-info">
+                <div class="d-flex align-items-center">
+                    <i class="fas fa-clock text-info me-3" style="font-size: 1.5rem;"></i>
+                    <div>
+                        <strong>Tempo Estimado:</strong> 5-10 minutos<br>
+                        <small>
+                            O tempo pode variar dependendo das configurações escolhidas e da complexidade do seu ambiente.
+                        </small>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Aviso Importante -->
+            {% if is_first_setup %}
+            <div class="alert alert-warning">
+                <div class="d-flex align-items-center">
+                    <i class="fas fa-exclamation-triangle text-warning me-3" style="font-size: 1.5rem;"></i>
+                    <div>
+                        <strong>Primeira Configuração Detectada</strong><br>
+                        <small>
+                            Este parece ser a primeira vez que você está configurando o sistema. 
+                            Recomendamos seguir todas as etapas para uma configuração completa.
+                        </small>
+                    </div>
+                </div>
+            </div>
+            {% endif %}
+
+            <!-- Botões de Ação Adiccionais -->
+            <div class="text-center mt-4">
+                <div class="btn-group" role="group">
+                    <a href="{% url 'config:dashboard' %}" class="btn btn-outline-secondary">
+                        <i class="fas fa-times"></i> Cancelar
+                    </a>
+                    <button type="button" class="btn btn-outline-info" data-bs-toggle="modal" data-bs-target="#helpModal">
+                        <i class="fas fa-question-circle"></i> Ajuda
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</form>
+
+<!-- Modal de Ajuda -->
+<div class="modal fade" id="helpModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">
+                    <i class="fas fa-question-circle text-info me-2"></i>
+                    Ajuda do Assistente de Configuração
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <div class="accordion" id="helpAccordion">
+                    <div class="accordion-item">
+                        <h2 class="accordion-header" id="headingOne">
+                            <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#collapseOne">
+                                O que faz o Assistente de Configuração?
+                            </button>
+                        </h2>
+                        <div id="collapseOne" class="accordion-collapse collapse show" data-bs-parent="#helpAccordion">
+                            <div class="accordion-body">
+                                O assistente analisa seu ambiente, detecta configurações atuais e guia você através 
+                                da configuração de componentes essenciais como banco de dados, email, segurança e 
+                                otimizações de performance.
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="accordion-item">
+                        <h2 class="accordion-header" id="headingTwo">
+                            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseTwo">
+                                É seguro usar o assistente?
+                            </button>
+                        </h2>
+                        <div id="collapseTwo" class="accordion-collapse collapse" data-bs-parent="#helpAccordion">
+                            <div class="accordion-body">
+                                Sim! O assistente cria backups automáticos antes de fazer alterações e todas as 
+                                configurações são validadas antes da aplicação. Você pode reverter mudanças se necessário.
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="accordion-item">
+                        <h2 class="accordion-header" id="headingThree">
+                            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseThree">
+                                Posso pular etapas?
+                            </button>
+                        </h2>
+                        <div id="collapseThree" class="accordion-collapse collapse" data-bs-parent="#helpAccordion">
+                            <div class="accordion-body">
+                                Sim, você pode pular etapas não essenciais. Etapas críticas de segurança não podem 
+                                ser puladas. Você sempre pode voltar e configurar itens pulados mais tarde.
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fechar</button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,350 @@
+/* 
+ * Componentes CSS Comuns - Projeto Havoc
+ * Estilos reutilizáveis para evitar duplicação
+ */
+
+/* ========================================
+   HERO SECTIONS
+   ======================================== */
+.hero-section {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    padding: 80px 0;
+    margin-bottom: 0;
+}
+
+.hero-section h1 {
+    font-weight: 700;
+    margin-bottom: 1.5rem;
+}
+
+.hero-section .lead {
+    font-size: 1.25rem;
+    margin-bottom: 2rem;
+}
+
+.hero-section .btn-warning {
+    background: #ffc107;
+    border-color: #ffc107;
+    color: #212529;
+    font-weight: 600;
+}
+
+.hero-section .btn-outline-light {
+    border-width: 2px;
+    font-weight: 600;
+}
+
+/* ========================================
+   FEATURE CARDS
+   ======================================== */
+.feature-card {
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    border: none;
+    height: 100%;
+    border-radius: 10px;
+    overflow: hidden;
+}
+
+.feature-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+}
+
+.feature-icon {
+    width: 60px;
+    height: 60px;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 20px;
+    color: white;
+    font-size: 24px;
+}
+
+.feature-card .card-title {
+    font-weight: 600;
+    color: #333;
+    margin-bottom: 1rem;
+}
+
+.feature-card .card-text {
+    color: #6c757d;
+    line-height: 1.6;
+}
+
+/* ========================================
+   STATS SECTIONS
+   ======================================== */
+.stats-section {
+    background: #f8f9fa;
+    padding: 60px 0;
+}
+
+.stat-item {
+    text-align: center;
+    padding: 20px;
+}
+
+.stat-number {
+    font-size: 3rem;
+    font-weight: 700;
+    color: #667eea;
+    display: block;
+    line-height: 1;
+}
+
+.stat-label {
+    font-size: 1.1rem;
+    color: #6c757d;
+    margin-top: 0.5rem;
+}
+
+/* ========================================
+   CARDS MODULARES
+   ======================================== */
+.module-card {
+    border: none;
+    border-radius: 10px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    transition: all 0.3s ease;
+    height: 100%;
+}
+
+.module-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 5px 20px rgba(0,0,0,0.15);
+}
+
+.module-card .card-header {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    border: none;
+    padding: 1.5rem;
+}
+
+.module-card .card-header h5 {
+    margin: 0;
+    font-weight: 600;
+}
+
+.module-card .card-body {
+    padding: 1.5rem;
+}
+
+.module-card .module-icon {
+    font-size: 2.5rem;
+    margin-bottom: 1rem;
+    display: block;
+}
+
+/* ========================================
+   BOTÕES PERSONALIZADOS
+   ======================================== */
+.btn-gradient {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    border: none;
+    color: white;
+    font-weight: 600;
+    padding: 0.75rem 1.5rem;
+    border-radius: 25px;
+    transition: all 0.3s ease;
+}
+
+.btn-gradient:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+    color: white;
+}
+
+.btn-gradient:focus {
+    box-shadow: 0 0 0 0.2rem rgba(102, 126, 234, 0.25);
+    color: white;
+}
+
+/* ========================================
+   ALERTAS PERSONALIZADOS
+   ======================================== */
+.alert-gradient {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    border: none;
+    border-radius: 10px;
+}
+
+.alert-gradient .alert-link {
+    color: #fff;
+    text-decoration: underline;
+}
+
+/* ========================================
+   FORMULÁRIOS
+   ======================================== */
+.form-floating-custom {
+    position: relative;
+}
+
+.form-floating-custom .form-control {
+    border-radius: 10px;
+    border: 2px solid #e9ecef;
+    padding: 1rem;
+    transition: all 0.3s ease;
+}
+
+.form-floating-custom .form-control:focus {
+    border-color: #667eea;
+    box-shadow: 0 0 0 0.2rem rgba(102, 126, 234, 0.25);
+}
+
+.form-floating-custom label {
+    color: #6c757d;
+    font-weight: 500;
+}
+
+/* ========================================
+   NAVEGAÇÃO
+   ======================================== */
+.navbar-brand-custom {
+    font-weight: 700;
+    font-size: 1.5rem;
+    color: #667eea !important;
+}
+
+.navbar-nav-custom .nav-link {
+    font-weight: 500;
+    color: #495057 !important;
+    transition: color 0.3s ease;
+}
+
+.navbar-nav-custom .nav-link:hover {
+    color: #667eea !important;
+}
+
+.navbar-nav-custom .nav-link.active {
+    color: #667eea !important;
+    font-weight: 600;
+}
+
+/* ========================================
+   FOOTER
+   ======================================== */
+.footer-custom {
+    background: #343a40;
+    color: #adb5bd;
+    padding: 3rem 0 1rem;
+    margin-top: auto;
+}
+
+.footer-custom h5 {
+    color: white;
+    font-weight: 600;
+    margin-bottom: 1rem;
+}
+
+.footer-custom a {
+    color: #adb5bd;
+    text-decoration: none;
+    transition: color 0.3s ease;
+}
+
+.footer-custom a:hover {
+    color: #667eea;
+}
+
+.footer-custom .social-links a {
+    display: inline-block;
+    width: 40px;
+    height: 40px;
+    background: #495057;
+    color: white;
+    text-align: center;
+    line-height: 40px;
+    border-radius: 50%;
+    margin-right: 10px;
+    transition: all 0.3s ease;
+}
+
+.footer-custom .social-links a:hover {
+    background: #667eea;
+    transform: translateY(-2px);
+}
+
+/* ========================================
+   UTILITÁRIOS
+   ======================================== */
+.text-gradient {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    font-weight: 700;
+}
+
+.bg-gradient-custom {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+}
+
+.shadow-custom {
+    box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+}
+
+.shadow-custom-hover {
+    transition: box-shadow 0.3s ease;
+}
+
+.shadow-custom-hover:hover {
+    box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+}
+
+/* ========================================
+   RESPONSIVIDADE
+   ======================================== */
+@media (max-width: 768px) {
+    .hero-section {
+        padding: 60px 0;
+    }
+    
+    .hero-section h1 {
+        font-size: 2rem;
+    }
+    
+    .feature-icon {
+        width: 50px;
+        height: 50px;
+        font-size: 20px;
+    }
+    
+    .stat-number {
+        font-size: 2.5rem;
+    }
+    
+    .stats-section {
+        padding: 40px 0;
+    }
+}
+
+@media (max-width: 576px) {
+    .hero-section {
+        padding: 40px 0;
+    }
+    
+    .hero-section h1 {
+        font-size: 1.75rem;
+    }
+    
+    .hero-section .lead {
+        font-size: 1.1rem;
+    }
+    
+    .module-card .card-header,
+    .module-card .card-body {
+        padding: 1rem;
+    }
+    
+    .btn-gradient {
+        padding: 0.5rem 1rem;
+        font-size: 0.9rem;
+    }
+}

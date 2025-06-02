@@ -1,0 +1,46 @@
+{% extends "base.html" %}
+
+{% block title %}{% if user.is_authenticated %}Confirmar Logout{% else %}Desconectado{% endif %}{% endblock %}
+
+{% block content %}
+    <main class="logout-container">
+        {% if user.is_authenticated %}
+            <!-- Formulário de confirmação de logout -->
+            <div class="confirm-icon">
+                <i class="fas fa-question-circle"></i>
+            </div>
+            <h2>Confirmar Logout</h2>
+            <p class="logout-message">Tem certeza que deseja sair do sistema? Você precisará fazer login novamente para acessar sua conta.</p>
+
+            <div class="logout-actions">
+
+
+                <form method="post" action="{% url 'accounts:logout' %}">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-danger">
+                        <i class="fas fa-sign-out-alt"></i> Sim, quero sair
+                    </button>
+                </form>
+                <a href="{% url 'accounts:profile' %}" class="btn btn-secondary">
+                    <i class="fas fa-times"></i> Cancelar
+                </a>
+            </div>
+        {% else %}
+            <!-- Mensagem de logout bem-sucedido -->
+            <div class="done-icon">
+                <i class="fas fa-sign-out-alt"></i>
+            </div>
+            <h2>Desconectado com Sucesso</h2>
+            <p class="logout-message">Você foi desconectado com sucesso do sistema. Obrigado por usar nossos serviços!</p>
+
+            <div class="logout-actions">
+                <a href="{% url 'accounts:login' %}" class="btn">
+                    <i class="fas fa-sign-in-alt"></i> Voltar para Login
+                </a>
+                <a href="/" class="btn btn-secondary">
+                    <i class="fas fa-home"></i> Página Inicial
+                </a>
+            </div>
+        {% endif %}
+    </main>
+{% endblock %}

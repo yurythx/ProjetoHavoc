@@ -1,0 +1,333 @@
+{% extends "config/wizard/base_wizard.html" %}
+{% load static %}
+
+{% block wizard_content %}
+<form id="wizard-form" method="post" action="{% url 'config:wizard_step' wizard.wizard_id 'environment' %}">
+    {% csrf_token %}
+    
+    <div class="row">
+        <div class="col-12">
+            <!-- Cabeçalho da Detecção -->
+            <div class="text-center mb-4">
+                <div class="spinner-border text-primary mb-3" role="status" id="detection-spinner" style="display: none;">
+                    <span class="visually-hidden">Detectando...</span>
+                </div>
+                <h3>Análise do Ambiente Concluída</h3>
+                <p class="text-muted">
+                    Analisamos seu ambiente de execução e geramos recomendações personalizadas.
+                </p>
+            </div>
+
+            <!-- Score do Ambiente -->
+            {% if environment_data %}
+            <div class="card mb-4">
+                <div class="card-body text-center">
+                    <div class="row align-items-center">
+                        <div class="col-md-4">
+                            <div class="position-relative d-inline-block">
+                                <canvas id="scoreChart" width="120" height="120"></canvas>
+                                <div class="position-absolute top-50 start-50 translate-middle">
+                                    <h2 class="mb-0">{{ environment_data.score }}</h2>
+                                    <small class="text-muted">Score</small>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-8 text-start">
+                            <h4>Status do Ambiente</h4>
+                            <p class="mb-2">
+                                {% if environment_data.score >= 80 %}
+                                    <span class="badge bg-success">Excelente</span>
+                                    Seu ambiente está bem configurado!
+                                {% elif environment_data.score >= 60 %}
+                                    <span class="badge bg-warning">Bom</span>
+                                    Algumas melhorias são recomendadas.
+                                {% elif environment_data.score >= 40 %}
+                                    <span class="badge bg-orange">Regular</span>
+                                    Várias otimizações são necessárias.
+                                {% else %}
+                                    <span class="badge bg-danger">Crítico</span>
+                                    Ação imediata é necessária!
+                                {% endif %}
+                            </p>
+                            <p class="text-muted mb-0">
+                                Baseado na análise de {{ environment_data.environment|length }} componentes do sistema.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% endif %}
+
+            <!-- Informações do Ambiente -->
+            {% if environment_data.environment %}
+            <div class="environment-info">
+                <!-- Sistema Operacional -->
+                {% if environment_data.environment.system %}
+                <div class="info-card">
+                    <h5><i class="fas fa-desktop"></i> Sistema Operacional</h5>
+                    <div class="row">
+                        <div class="col-6">
+                            <strong>OS:</strong> {{ environment_data.environment.system.os }}<br>
+                            <strong>Versão:</strong> {{ environment_data.environment.system.os_version }}<br>
+                            <strong>Arquitetura:</strong> {{ environment_data.environment.system.architecture }}
+                        </div>
+                        <div class="col-6">
+                            <strong>CPUs:</strong> {{ environment_data.environment.system.cpu_count }}<br>
+                            <strong>Memória:</strong> {{ environment_data.environment.system.memory_total|filesizeformat }}<br>
+                            <strong>Hostname:</strong> {{ environment_data.environment.system.hostname }}
+                        </div>
+                    </div>
+                </div>
+                {% endif %}
+
+                <!-- Python -->
+                {% if environment_data.environment.python %}
+                <div class="info-card">
+                    <h5><i class="fab fa-python"></i> Python</h5>
+                    <div class="row">
+                        <div class="col-6">
+                            <strong>Versão:</strong> {{ environment_data.environment.python.version }}<br>
+                            <strong>Implementação:</strong> {{ environment_data.environment.python.implementation }}
+                        </div>
+                        <div class="col-6">
+                            <strong>Virtual Env:</strong> 
+                            {% if environment_data.environment.python.virtual_env %}
+                                <span class="status-badge success">Ativo</span>
+                            {% else %}
+                                <span class="status-badge warning">Não detectado</span>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+                {% endif %}
+
+                <!-- Django -->
+                {% if environment_data.environment.django %}
+                <div class="info-card">
+                    <h5><i class="fas fa-code"></i> Django</h5>
+                    <div class="row">
+                        <div class="col-6">
+                            <strong>Versão:</strong> {{ environment_data.environment.django.version }}<br>
+                            <strong>Debug:</strong> 
+                            {% if environment_data.environment.django.debug %}
+                                <span class="status-badge warning">Ativo</span>
+                            {% else %}
+                                <span class="status-badge success">Inativo</span>
+                            {% endif %}
+                        </div>
+                        <div class="col-6">
+                            <strong>Apps:</strong> {{ environment_data.environment.django.installed_apps }}<br>
+                            <strong>Middleware:</strong> {{ environment_data.environment.django.middleware }}
+                        </div>
+                    </div>
+                </div>
+                {% endif %}
+
+                <!-- Banco de Dados -->
+                {% if environment_data.environment.database %}
+                <div class="info-card">
+                    <h5><i class="fas fa-database"></i> Banco de Dados</h5>
+                    <div class="row">
+                        <div class="col-6">
+                            <strong>Engine:</strong> {{ environment_data.environment.database.engine|default:"N/A" }}<br>
+                            <strong>Host:</strong> {{ environment_data.environment.database.host|default:"localhost" }}
+                        </div>
+                        <div class="col-6">
+                            <strong>Status:</strong> 
+                            {% if environment_data.environment.database.connection_status == 'connected' %}
+                                <span class="status-badge success">Conectado</span>
+                            {% else %}
+                                <span class="status-badge danger">Desconectado</span>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+                {% endif %}
+
+                <!-- Servidor Web -->
+                {% if environment_data.environment.web_server %}
+                <div class="info-card">
+                    <h5><i class="fas fa-server"></i> Servidor Web</h5>
+                    <div class="row">
+                        <div class="col-6">
+                            <strong>Tipo:</strong> {{ environment_data.environment.web_server.type|title }}<br>
+                            <strong>Servidor:</strong> {{ environment_data.environment.web_server.server }}
+                        </div>
+                        <div class="col-6">
+                            {% if environment_data.environment.web_server.recommendation %}
+                                <small class="text-warning">
+                                    <i class="fas fa-exclamation-triangle"></i>
+                                    {{ environment_data.environment.web_server.recommendation }}
+                                </small>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+                {% endif %}
+
+                <!-- Cache -->
+                {% if environment_data.environment.cache %}
+                <div class="info-card">
+                    <h5><i class="fas fa-memory"></i> Sistema de Cache</h5>
+                    <div class="row">
+                        <div class="col-6">
+                            <strong>Backend:</strong> {{ environment_data.environment.cache.type|default:"Não configurado" }}<br>
+                            <strong>Configurado:</strong> 
+                            {% if environment_data.environment.cache.configured %}
+                                <span class="status-badge success">Sim</span>
+                            {% else %}
+                                <span class="status-badge warning">Não</span>
+                            {% endif %}
+                        </div>
+                        <div class="col-6">
+                            <strong>Redis:</strong> 
+                            {% if environment_data.environment.cache.redis_available %}
+                                <span class="status-badge success">Disponível</span>
+                            {% else %}
+                                <span class="status-badge warning">Não disponível</span>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+                {% endif %}
+
+                <!-- Performance -->
+                {% if environment_data.environment.performance %}
+                <div class="info-card">
+                    <h5><i class="fas fa-tachometer-alt"></i> Performance</h5>
+                    <div class="row">
+                        <div class="col-6">
+                            <strong>CPU:</strong> {{ environment_data.environment.performance.cpu_usage }}%<br>
+                            <strong>Memória:</strong> {{ environment_data.environment.performance.memory_usage }}%
+                        </div>
+                        <div class="col-6">
+                            <strong>Debug Toolbar:</strong> 
+                            {% if environment_data.environment.performance.django_debug_toolbar %}
+                                <span class="status-badge warning">Ativo</span>
+                            {% else %}
+                                <span class="status-badge success">Inativo</span>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+                {% endif %}
+            </div>
+            {% endif %}
+
+            <!-- Recomendações Geradas -->
+            {% if recommendations %}
+            <div class="card mt-4">
+                <div class="card-header">
+                    <h5 class="mb-0">
+                        <i class="fas fa-lightbulb text-warning me-2"></i>
+                        Recomendações Geradas ({{ recommendations|length }})
+                    </h5>
+                </div>
+                <div class="card-body">
+                    {% for recommendation in recommendations %}
+                    <div class="recommendation-card {{ recommendation.priority }}">
+                        <div class="d-flex justify-content-between align-items-start">
+                            <div class="flex-grow-1">
+                                <div class="d-flex align-items-center mb-2">
+                                    <i class="{{ recommendation.get_category_icon }} me-2"></i>
+                                    <h6 class="mb-0">{{ recommendation.title }}</h6>
+                                    <span class="badge bg-{{ recommendation.get_priority_color }} ms-2">
+                                        {{ recommendation.get_priority_display }}
+                                    </span>
+                                </div>
+                                <p class="mb-2">{{ recommendation.description }}</p>
+                                {% if recommendation.estimated_impact %}
+                                <small class="text-muted">
+                                    <strong>Impacto estimado:</strong> {{ recommendation.estimated_impact }}
+                                </small>
+                                {% endif %}
+                            </div>
+                            <div class="ms-3">
+                                {% if recommendation.auto_apply %}
+                                    <button type="button" class="btn btn-primary btn-sm" 
+                                            onclick="applyRecommendation({{ recommendation.id }})">
+                                        <i class="fas fa-magic"></i> Aplicar
+                                    </button>
+                                {% else %}
+                                    <span class="badge bg-secondary">Manual</span>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+            {% endif %}
+
+            <!-- Resumo da Detecção -->
+            <div class="alert alert-info mt-4">
+                <div class="d-flex align-items-center">
+                    <i class="fas fa-info-circle text-info me-3" style="font-size: 1.5rem;"></i>
+                    <div>
+                        <strong>Detecção Concluída</strong><br>
+                        <small>
+                            A análise do ambiente foi concluída. As recomendações acima foram geradas 
+                            baseadas nas configurações detectadas. Você pode aplicá-las agora ou 
+                            continuar para as próximas etapas.
+                        </small>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</form>
+{% endblock %}
+
+{% block extra_js %}
+{{ block.super }}
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+// Gráfico de Score
+{% if environment_data %}
+const ctx = document.getElementById('scoreChart').getContext('2d');
+const score = {{ environment_data.score }};
+
+new Chart(ctx, {
+    type: 'doughnut',
+    data: {
+        datasets: [{
+            data: [score, 100 - score],
+            backgroundColor: [
+                score >= 80 ? '#28a745' : score >= 60 ? '#ffc107' : score >= 40 ? '#fd7e14' : '#dc3545',
+                '#e9ecef'
+            ],
+            borderWidth: 0
+        }]
+    },
+    options: {
+        responsive: false,
+        maintainAspectRatio: false,
+        cutout: '70%',
+        plugins: {
+            legend: {
+                display: false
+            },
+            tooltip: {
+                enabled: false
+            }
+        }
+    }
+});
+{% endif %}
+
+// Animação de entrada das cards
+document.addEventListener('DOMContentLoaded', function() {
+    const cards = document.querySelectorAll('.info-card, .recommendation-card');
+    cards.forEach((card, index) => {
+        card.style.opacity = '0';
+        card.style.transform = 'translateY(20px)';
+        
+        setTimeout(() => {
+            card.style.transition = 'all 0.5s ease';
+            card.style.opacity = '1';
+            card.style.transform = 'translateY(0)';
+        }, index * 100);
+    });
+});
+</script>
+{% endblock %}

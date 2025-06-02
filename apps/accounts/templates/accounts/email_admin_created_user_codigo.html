@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Conta Criada por Administrador</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f8f9fa;
+        }
+        .container {
+            background: white;
+            padding: 40px;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+            padding-bottom: 20px;
+            border-bottom: 2px solid #e9ecef;
+        }
+        .logo {
+            font-size: 24px;
+            font-weight: bold;
+            color: #007bff;
+            margin-bottom: 10px;
+        }
+        .title {
+            color: #2c3e50;
+            font-size: 28px;
+            margin-bottom: 10px;
+        }
+        .subtitle {
+            color: #6c757d;
+            font-size: 16px;
+        }
+        .content {
+            margin: 30px 0;
+        }
+        .codigo-container {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 15px;
+            padding: 30px;
+            text-align: center;
+            margin: 30px 0;
+            color: white;
+        }
+        .codigo {
+            font-size: 48px;
+            font-weight: bold;
+            letter-spacing: 8px;
+            font-family: 'Courier New', monospace;
+            margin: 20px 0;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+        .codigo-label {
+            font-size: 18px;
+            margin-bottom: 10px;
+            font-weight: bold;
+            opacity: 0.9;
+        }
+        .codigo-info {
+            font-size: 14px;
+            margin-top: 15px;
+            opacity: 0.8;
+        }
+        .admin-info {
+            background: #e3f2fd;
+            border: 1px solid #90caf9;
+            color: #0d47a1;
+            padding: 20px;
+            border-radius: 8px;
+            margin: 20px 0;
+        }
+        .account-info {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 8px;
+            margin: 20px 0;
+            border-left: 4px solid #007bff;
+        }
+        .warning {
+            background: #fff3cd;
+            border: 1px solid #ffeaa7;
+            color: #856404;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 20px 0;
+        }
+        .steps {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 8px;
+            margin: 20px 0;
+        }
+        .step {
+            display: flex;
+            align-items: center;
+            margin: 10px 0;
+            padding: 10px;
+            background: white;
+            border-radius: 5px;
+            border-left: 4px solid #007bff;
+        }
+        .step-number {
+            background: #007bff;
+            color: white;
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            margin-right: 15px;
+            flex-shrink: 0;
+        }
+        .footer {
+            text-align: center;
+            margin-top: 40px;
+            padding-top: 20px;
+            border-top: 1px solid #e9ecef;
+            color: #6c757d;
+            font-size: 14px;
+        }
+        .security-info {
+            background: #d1ecf1;
+            border: 1px solid #bee5eb;
+            color: #0c5460;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 20px 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="logo">👥 Sistema de Gestão</div>
+            <h1 class="title">Conta Criada por Administrador</h1>
+            <p class="subtitle">Sua conta foi criada e precisa ser ativada</p>
+        </div>
+
+        <div class="content">
+            <p>Olá <strong>{{ user.get_full_name|default:user.username }}</strong>,</p>
+
+            <p>Uma conta foi criada para você em nosso sistema por um administrador. Para começar a usar o sistema, você precisa ativar sua conta usando o código abaixo:</p>
+
+            <div class="admin-info">
+                <h4 style="margin-top: 0; color: #0d47a1;">👤 Informações da Criação</h4>
+                <p><strong>📋 Criado por:</strong> {{ admin_user.get_full_name|default:admin_user.username }}</p>
+                <p><strong>📧 Email do admin:</strong> {{ admin_user.email }}</p>
+                <p><strong>🕒 Data/Hora:</strong> {{ "now"|date:"d/m/Y H:i" }}</p>
+                <p><strong>🎯 Motivo:</strong> Conta criada por administrador do sistema</p>
+            </div>
+
+            <div class="codigo-container">
+                <div class="codigo-label">🔑 SEU CÓDIGO DE ATIVAÇÃO</div>
+                <div class="codigo">{{ codigo }}</div>
+                <div class="codigo-info">
+                    <strong>⏰ Válido por 30 minutos</strong><br>
+                    <small>Código gerado em: {{ "now"|date:"d/m/Y H:i" }}</small>
+                </div>
+            </div>
+
+            <div class="account-info">
+                <h4 style="margin-top: 0; color: #007bff;">📋 Detalhes da Sua Conta</h4>
+                <p><strong>👤 Nome de usuário:</strong> {{ user.username }}</p>
+                <p><strong>📧 Email:</strong> {{ user.email }}</p>
+                <p><strong>👥 Grupos:</strong> 
+                    {% for group in user.groups.all %}
+                        {{ group.name }}{% if not forloop.last %}, {% endif %}
+                    {% empty %}
+                        Usuario (padrão)
+                    {% endfor %}
+                </p>
+                <p><strong>🏢 Cargo:</strong> {{ user.cargo|default:"Não definido" }}</p>
+                <p><strong>🏬 Departamento:</strong> {{ user.departamento|default:"Não definido" }}</p>
+            </div>
+
+            <div class="steps">
+                <h3 style="margin-top: 0; color: #007bff;">📋 Como ativar sua conta:</h3>
+                
+                <div class="step">
+                    <div class="step-number">1</div>
+                    <div>
+                        <strong>Acesse a página de ativação</strong><br>
+                        <small>Use o link fornecido pelo administrador ou acesse o sistema</small>
+                    </div>
+                </div>
+                
+                <div class="step">
+                    <div class="step-number">2</div>
+                    <div>
+                        <strong>Digite seu email</strong><br>
+                        <small>{{ user.email }}</small>
+                    </div>
+                </div>
+                
+                <div class="step">
+                    <div class="step-number">3</div>
+                    <div>
+                        <strong>Insira o código de ativação</strong><br>
+                        <small>Digite exatamente: <code>{{ codigo }}</code></small>
+                    </div>
+                </div>
+                
+                <div class="step">
+                    <div class="step-number">4</div>
+                    <div>
+                        <strong>Defina sua senha</strong><br>
+                        <small>Após a ativação, você será direcionado para definir uma senha segura</small>
+                    </div>
+                </div>
+            </div>
+
+            <div class="security-info">
+                <p><strong>🛡️ Informações de Segurança:</strong></p>
+                <ul>
+                    <li><strong>Código único:</strong> Este código só pode ser usado uma vez</li>
+                    <li><strong>Validade:</strong> Expira em 30 minutos após o envio</li>
+                    <li><strong>Tentativas:</strong> Máximo de 5 tentativas por código</li>
+                    <li><strong>Administrador:</strong> Sua conta foi criada por {{ admin_user.get_full_name|default:admin_user.username }}</li>
+                    <li><strong>Suporte:</strong> Em caso de dúvidas, entre em contato com o administrador</li>
+                </ul>
+            </div>
+
+            <div class="warning">
+                <p><strong>⚠️ IMPORTANTE - Primeira Ativação:</strong></p>
+                <ul>
+                    <li><strong>Senha temporária:</strong> Uma senha temporária foi gerada automaticamente</li>
+                    <li><strong>Alteração obrigatória:</strong> Você deve definir uma nova senha no primeiro login</li>
+                    <li><strong>Segurança:</strong> Use uma senha forte com pelo menos 8 caracteres</li>
+                    <li><strong>Não foi você?</strong> Entre em contato com {{ admin_user.get_full_name|default:admin_user.username }} imediatamente</li>
+                </ul>
+            </div>
+
+            <div class="account-info">
+                <p><strong>🎯 Próximos Passos Após a Ativação:</strong></p>
+                <ol>
+                    <li>Complete seu perfil com informações pessoais</li>
+                    <li>Familiarize-se com as funcionalidades do sistema</li>
+                    <li>Entre em contato com o administrador se tiver dúvidas</li>
+                    <li>Mantenha suas informações de login seguras</li>
+                </ol>
+            </div>
+        </div>
+
+        <div class="footer">
+            <p><strong>Esta conta foi criada por um administrador do sistema.</strong></p>
+            <p>Se você não esperava receber este email, entre em contato com {{ admin_user.get_full_name|default:admin_user.username }} ({{ admin_user.email }}).</p>
+            <p>© {{ "now"|date:"Y" }} Sistema de Gestão - Todos os direitos reservados</p>
+        </div>
+    </div>
+</body>
+</html>

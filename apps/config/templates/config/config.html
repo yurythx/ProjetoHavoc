@@ -1,0 +1,424 @@
+{% extends "config/base_config.html" %}
+{% load crispy_forms_tags %}
+{% load static %}
+
+{% block config_title %}Painel de Configurações - Projeto Havoc{% endblock %}
+{% block config_description %}Central de configurações organizadas por módulos e seções{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/components/common.css' %}">
+<link rel="stylesheet" href="{% static 'css/config.css' %}">
+<style>
+.config-module {
+    transition: all 0.3s ease;
+    border: none;
+    border-radius: 15px;
+    overflow: hidden;
+    height: 100%;
+}
+
+.config-module:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+}
+
+.config-module .card-header {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    border: none;
+    padding: 1.5rem;
+    position: relative;
+}
+
+.config-module .module-icon {
+    font-size: 2.5rem;
+    margin-bottom: 0.5rem;
+    display: block;
+}
+
+.config-module .card-body {
+    padding: 1.5rem;
+}
+
+.config-section {
+    background: #f8f9fa;
+    border-radius: 10px;
+    padding: 1rem;
+    margin-bottom: 1rem;
+    transition: background 0.3s ease;
+}
+
+.config-section:hover {
+    background: #e9ecef;
+}
+
+.section-item {
+    display: flex;
+    align-items: center;
+    padding: 0.75rem;
+    border-radius: 8px;
+    text-decoration: none;
+    color: #495057;
+    transition: all 0.3s ease;
+    margin-bottom: 0.5rem;
+}
+
+.section-item:hover {
+    background: white;
+    color: #667eea;
+    text-decoration: none;
+    transform: translateX(5px);
+}
+
+.section-item i {
+    width: 20px;
+    margin-right: 10px;
+    text-align: center;
+}
+
+.status-badge {
+    font-size: 0.75rem;
+    padding: 0.25rem 0.5rem;
+    border-radius: 12px;
+    margin-left: auto;
+}
+
+.quick-stats {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    border-radius: 15px;
+    padding: 2rem;
+    margin-bottom: 2rem;
+}
+
+.stat-item {
+    text-align: center;
+}
+
+.stat-number {
+    font-size: 2rem;
+    font-weight: 700;
+    display: block;
+}
+
+.stat-label {
+    font-size: 0.9rem;
+    opacity: 0.9;
+}
+</style>
+{% endblock %}
+
+{% block config_content %}
+
+<!-- Assistente de Configuração -->
+{% if user.is_staff %}
+<div class="alert alert-info border-0 mb-4" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border-radius: 15px;">
+    <div class="row align-items-center">
+        <div class="col-md-8">
+            <div class="d-flex align-items-center">
+                <i class="fas fa-magic me-3" style="font-size: 2.5rem;"></i>
+                <div>
+                    <h4 class="mb-1">🧙‍♂️ Assistente de Configuração</h4>
+                    <p class="mb-0">Configure seu sistema de forma guiada com detecção automática de ambiente e recomendações personalizadas.</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4 text-end">
+            <a href="{% url 'config:wizard' %}" class="btn btn-light btn-lg">
+                <i class="fas fa-rocket me-2"></i>
+                Iniciar Assistente
+            </a>
+        </div>
+    </div>
+</div>
+{% endif %}
+
+<!-- Estatísticas Rápidas -->
+<div class="quick-stats">
+    <div class="row text-center">
+        <div class="col-md-3">
+            <div class="stat-item">
+                <span class="stat-number">{{ app_count|default:0 }}</span>
+                <div class="stat-label">Módulos</div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="stat-item">
+                <span class="stat-number">{{ active_app_count|default:0 }}</span>
+                <div class="stat-label">Ativos</div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="stat-item">
+                <span class="stat-number">{{ email_config_count|default:0 }}</span>
+                <div class="stat-label">Emails</div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="stat-item">
+                <span class="stat-number">{{ stats.total|default:0 }}</span>
+                <div class="stat-label">Usuários</div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Módulos de Configuração -->
+<div class="row">
+    <!-- Módulo: Sistema -->
+    <div class="col-lg-4 col-md-6 mb-4">
+        <div class="card config-module">
+            <div class="card-header text-center">
+                <i class="fas fa-cogs module-icon"></i>
+                <h5 class="mb-0">Sistema</h5>
+                <small>Configurações gerais</small>
+            </div>
+            <div class="card-body">
+                <div class="config-section">
+                    <a href="{% if system_config %}{% url 'config:system-update' system_config.slug %}{% else %}#{% endif %}" class="section-item">
+                        <i class="fas fa-globe"></i>
+                        <span>Configurações Gerais</span>
+                        <span class="status-badge bg-success">Ativo</span>
+                    </a>
+                    <a href="{% url 'config:app-list' %}" class="section-item">
+                        <i class="fas fa-puzzle-piece"></i>
+                        <span>Módulos</span>
+                        <span class="status-badge bg-info">{{ active_app_count }}/{{ app_count }}</span>
+                    </a>
+                </div>
+                <div class="text-center">
+                    <small class="text-muted">
+                        Site: {{ system_config.site_name|default:"Não configurado" }}
+                    </small>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Módulo: Comunicação -->
+    <div class="col-lg-4 col-md-6 mb-4">
+        <div class="card config-module">
+            <div class="card-header text-center">
+                <i class="fas fa-envelope module-icon"></i>
+                <h5 class="mb-0">Comunicação</h5>
+                <small>Email e notificações</small>
+            </div>
+            <div class="card-body">
+                <div class="config-section">
+                    <a href="{% url 'config:email-list' %}" class="section-item">
+                        <i class="fas fa-server"></i>
+                        <span>Servidores SMTP</span>
+                        <span class="status-badge bg-info">{{ email_config_count|default:0 }}</span>
+                    </a>
+                    <a href="{% url 'config:email-guide' %}" class="section-item">
+                        <i class="fas fa-question-circle"></i>
+                        <span>Guia de Configuração</span>
+                    </a>
+                    <a href="{% url 'config:email-create' %}" class="section-item">
+                        <i class="fas fa-plus"></i>
+                        <span>Novo Servidor</span>
+                    </a>
+                </div>
+                <div class="text-center">
+                    <small class="text-muted">
+                        Ativos: {{ active_email_config_count|default:0 }}
+                    </small>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Módulo: Autenticação -->
+    <div class="col-lg-4 col-md-6 mb-4">
+        <div class="card config-module">
+            <div class="card-header text-center">
+                <i class="fas fa-shield-alt module-icon"></i>
+                <h5 class="mb-0">Autenticação</h5>
+                <small>LDAP e Social Auth</small>
+            </div>
+            <div class="card-body">
+                <div class="config-section">
+                    <a href="{% url 'config:ldap-list' %}" class="section-item">
+                        <i class="fas fa-building"></i>
+                        <span>Servidores LDAP</span>
+                        <span class="status-badge bg-info">{{ ldap_config_count|default:0 }}</span>
+                    </a>
+                    <a href="{% url 'config:social-provider-list' %}" class="section-item">
+                        <i class="fas fa-share-alt"></i>
+                        <span>Provedores Sociais</span>
+                        <span class="status-badge bg-info">{{ social_provider_count|default:0 }}</span>
+                    </a>
+                </div>
+                <div class="text-center">
+                    <small class="text-muted">
+                        LDAP: {{ active_ldap_config_count|default:0 }} | Social: {{ active_social_provider_count|default:0 }}
+                    </small>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Módulo: Banco de Dados -->
+    <div class="col-lg-4 col-md-6 mb-4">
+        <div class="card config-module">
+            <div class="card-header text-center">
+                <i class="fas fa-database module-icon"></i>
+                <h5 class="mb-0">Banco de Dados</h5>
+                <small>Conexões e configurações</small>
+            </div>
+            <div class="card-body">
+                <div class="config-section">
+                    <a href="{% url 'config:database-list' %}" class="section-item">
+                        <i class="fas fa-server"></i>
+                        <span>Configurações</span>
+                        <span class="status-badge bg-info">{{ database_config_count|default:0 }}</span>
+                    </a>
+                    <a href="{% url 'config:env-variables' %}" class="section-item">
+                        <i class="fas fa-cog"></i>
+                        <span>Variáveis</span>
+                        <span class="status-badge bg-warning">{{ env_variable_count|default:0 }}</span>
+                    </a>
+                </div>
+                <div class="text-center">
+                    <small class="text-muted">
+                        Ativos: {{ active_database_config_count|default:0 }}
+                    </small>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Módulo: Interface -->
+    <div class="col-lg-4 col-md-6 mb-4">
+        <div class="card config-module">
+            <div class="card-header text-center">
+                <i class="fas fa-desktop module-icon"></i>
+                <h5 class="mb-0">Interface</h5>
+                <small>Widgets e menus</small>
+            </div>
+            <div class="card-body">
+                <div class="config-section">
+                    <a href="{% url 'config:widget-list' %}" class="section-item">
+                        <i class="fas fa-th-large"></i>
+                        <span>Widgets</span>
+                        <span class="status-badge bg-info">{{ widget_count|default:0 }}</span>
+                    </a>
+                    <a href="{% url 'config:menu-list' %}" class="section-item">
+                        <i class="fas fa-bars"></i>
+                        <span>Menus</span>
+                        <span class="status-badge bg-info">{{ menu_count|default:0 }}</span>
+                    </a>
+                </div>
+                <div class="text-center">
+                    <small class="text-muted">
+                        Widgets: {{ active_widget_count|default:0 }} | Menus: {{ active_menu_count|default:0 }}
+                    </small>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Módulo: Extensões -->
+    <div class="col-lg-4 col-md-6 mb-4">
+        <div class="card config-module">
+            <div class="card-header text-center">
+                <i class="fas fa-plug module-icon"></i>
+                <h5 class="mb-0">Extensões</h5>
+                <small>Plugins e backup</small>
+            </div>
+            <div class="card-body">
+                <div class="config-section">
+                    <a href="{% url 'config:plugin-list' %}" class="section-item">
+                        <i class="fas fa-puzzle-piece"></i>
+                        <span>Plugins</span>
+                        <span class="status-badge bg-info">{{ plugin_count|default:0 }}</span>
+                    </a>
+                    <a href="{% url 'config:backup-list' %}" class="section-item">
+                        <i class="fas fa-save"></i>
+                        <span>Backups</span>
+                        <span class="status-badge bg-success">{{ backup_count|default:0 }}</span>
+                    </a>
+                </div>
+                <div class="text-center">
+                    <small class="text-muted">
+                        Plugins: {{ active_plugin_count|default:0 }} | Backups: {{ protected_backup_count|default:0 }}
+                    </small>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    {% if user.is_staff %}
+    <!-- Módulo: Administração (apenas para staff) -->
+    <div class="col-lg-4 col-md-6 mb-4">
+        <div class="card config-module">
+            <div class="card-header text-center">
+                <i class="fas fa-users-cog module-icon"></i>
+                <h5 class="mb-0">Administração</h5>
+                <small>Usuários e sistema</small>
+            </div>
+            <div class="card-body">
+                <div class="config-section">
+                    <a href="{% url 'config:user-list' %}" class="section-item">
+                        <i class="fas fa-users"></i>
+                        <span>Usuários</span>
+                        <span class="status-badge bg-info">{{ stats.total|default:0 }}</span>
+                    </a>
+                    <a href="{% url 'config:backup-create' %}" class="section-item">
+                        <i class="fas fa-download"></i>
+                        <span>Criar Backup</span>
+                    </a>
+                </div>
+                <div class="text-center">
+                    <small class="text-muted">
+                        Ativos: {{ stats.active|default:0 }}
+                    </small>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+</div>
+
+{% if user.is_staff %}
+<!-- Seção de Ações Rápidas -->
+<div class="card">
+    <div class="card-header">
+        <h5 class="mb-0">
+            <i class="fas fa-bolt me-2"></i>
+            Ações Rápidas
+        </h5>
+    </div>
+    <div class="card-body">
+        <div class="row">
+            <div class="col-md-3 mb-2">
+                <a href="{% url 'config:email-create' %}" class="btn btn-outline-primary btn-sm w-100">
+                    <i class="fas fa-plus me-1"></i>Novo Email
+                </a>
+            </div>
+            <div class="col-md-3 mb-2">
+                <a href="{% url 'config:user-create' %}" class="btn btn-outline-success btn-sm w-100">
+                    <i class="fas fa-user-plus me-1"></i>Novo Usuário
+                </a>
+            </div>
+            <div class="col-md-3 mb-2">
+                <a href="{% url 'config:backup-create' %}" class="btn btn-outline-warning btn-sm w-100">
+                    <i class="fas fa-save me-1"></i>Backup
+                </a>
+            </div>
+            <div class="col-md-3 mb-2">
+                <a href="{% url 'config:env-variable-create' %}" class="btn btn-outline-info btn-sm w-100">
+                    <i class="fas fa-cog me-1"></i>Nova Variável
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endif %}
+
+{% endblock %}
+
+{% block extra_js %}
+<script src="{% static 'js/config-tooltips.js' %}"></script>
+<script src="{% static 'js/config-search.js' %}"></script>
+{% endblock %}

@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8" />
+    <title>Confirme seu email</title>
+    {# CSS movido para arquivos modulares #}
+</head>
+<body>
+    <div class="container">
+        <h2>Olá {{ user.username }},</h2>
+        <p>Obrigado por se registrar em nossa plataforma. Para ativar sua conta, por favor clique no botão abaixo:</p>
+
+        <p style="text-align: center;">
+            <a href="{{ confirmation_link }}" class="btn" rel="noopener" target="_blank">
+                Confirmar Email
+            </a>
+        </p>
+
+        <p>Se preferir, copie e cole o link abaixo no seu navegador:</p>
+        <p>
+            <a href="{{ confirmation_link }}" rel="noopener" target="_blank">
+                {{ confirmation_link }}
+            </a>
+        </p>
+
+        <p>Se você não solicitou este registro, por favor ignore este email.</p>
+
+        <div class="footer">
+            <p>© {{ year|default:"2025" }} Sua Empresa. Todos os direitos reservados.</p>
+        </div>
+    </div>
+</body>
+</html>

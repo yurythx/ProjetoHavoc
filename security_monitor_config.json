@@ -1,0 +1,30 @@
+{
+  "log_files": [
+    "logs/security.log",
+    "logs/django.log"
+  ],
+  "alert_thresholds": {
+    "failed_logins_per_minute": 10,
+    "requests_per_minute_per_ip": 100,
+    "suspicious_requests_per_hour": 50,
+    "error_rate_threshold": 0.1
+  },
+  "email_alerts": {
+    "enabled": false,
+    "smtp_server": "localhost",
+    "smtp_port": 587,
+    "username": "",
+    "password": "",
+    "from_email": "security@projetohavoc.com",
+    "to_emails": [
+      "admin@projetohavoc.com"
+    ]
+  },
+  "webhook_alerts": {
+    "enabled": false,
+    "url": "",
+    "headers": {}
+  },
+  "monitoring_interval": 30,
+  "retention_days": 30
+}

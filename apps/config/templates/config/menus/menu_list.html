@@ -1,0 +1,229 @@
+{% extends "config/base_config.html" %}
+{% load crispy_forms_tags %}
+
+{% block config_title %}Gerenciamento de Menus{% endblock %}
+{% block config_description %}Configure menus dinâmicos com hierarquia e permissões personalizadas{% endblock %}
+
+{% block config_content %}
+
+<!-- Filtros e Estatísticas -->
+<div class="row mb-4">
+    <div class="col-md-8">
+        <div class="card">
+            <div class="card-body">
+                <h5 class="card-title">Filtros</h5>
+                <form method="get" class="row g-3">
+                    <div class="col-md-6">
+                        <label for="type" class="form-label">Tipo de Menu</label>
+                        <select name="type" id="type" class="form-select">
+                            <option value="">Todos os tipos</option>
+                            {% for value, label in menu_types %}
+                                <option value="{{ value }}" {% if current_type == value %}selected{% endif %}>{{ label }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="col-md-6 d-flex align-items-end">
+                        <button type="submit" class="btn btn-primary me-2">
+                            <i class="fas fa-filter"></i> Filtrar
+                        </button>
+                        <a href="{% url 'config:menu-list' %}" class="btn btn-outline-secondary">
+                            <i class="fas fa-times"></i> Limpar
+                        </a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card bg-info text-white">
+            <div class="card-body text-center">
+                <h5 class="card-title">Total de Menus</h5>
+                <h2 class="display-4">{{ menus|length }}</h2>
+                <p class="mb-0">{{ menus|length|pluralize:"menu,menus" }} configurado{{ menus|length|pluralize:",s" }}</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Ações -->
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <h4>Lista de Menus</h4>
+    <a href="{% url 'config:menu-create' %}" class="btn btn-success">
+        <i class="fas fa-plus"></i> Criar Novo Menu
+    </a>
+</div>
+
+<!-- Lista de Menus -->
+{% if menus %}
+    <div class="card">
+        <div class="card-body">
+            {% regroup menus by menu_type as menu_groups %}
+            {% for group in menu_groups %}
+                <h5 class="border-bottom pb-2 mb-3">
+                    <i class="fas fa-bars me-2"></i>
+                    {{ group.grouper|capfirst }} - {{ group.list|length }} item{{ group.list|length|pluralize:",ns" }}
+                </h5>
+                
+                <div class="table-responsive mb-4">
+                    <table class="table table-hover">
+                        <thead class="table-light">
+                            <tr>
+                                <th>Título</th>
+                                <th>URL</th>
+                                <th>Ícone</th>
+                                <th>Ordem</th>
+                                <th>Status</th>
+                                <th>Permissões</th>
+                                <th>Ações</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for menu in group.list %}
+                                <tr {% if not menu.is_active %}class="table-secondary"{% endif %}>
+                                    <td>
+                                        {% if menu.parent %}
+                                            <i class="fas fa-level-up-alt text-muted me-1"></i>
+                                        {% endif %}
+                                        <strong>{{ menu.title }}</strong>
+                                        {% if menu.badge_text %}
+                                            <span class="badge bg-{{ menu.badge_color|default:'primary' }} ms-1">{{ menu.badge_text }}</span>
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        {% if menu.url %}
+                                            <code class="small">{{ menu.url }}</code>
+                                            {% if menu.is_external %}
+                                                <i class="fas fa-external-link-alt text-muted ms-1" title="Link externo"></i>
+                                            {% endif %}
+                                        {% else %}
+                                            <span class="text-muted">-</span>
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        {% if menu.icon %}
+                                            <i class="{{ menu.icon }} me-1"></i>
+                                            <small class="text-muted">{{ menu.icon }}</small>
+                                        {% else %}
+                                            <span class="text-muted">-</span>
+                                        {% endif %}
+                                    </td>
+                                    <td>{{ menu.order }}</td>
+                                    <td>
+                                        {% if menu.is_active %}
+                                            <span class="badge bg-success">Ativo</span>
+                                        {% else %}
+                                            <span class="badge bg-danger">Inativo</span>
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        <div class="d-flex flex-wrap gap-1">
+                                            {% if menu.staff_only %}
+                                                <span class="badge bg-warning text-dark">Staff</span>
+                                            {% endif %}
+                                            {% if menu.authenticated_only %}
+                                                <span class="badge bg-info">Auth</span>
+                                            {% endif %}
+                                            {% if menu.required_permission %}
+                                                <span class="badge bg-secondary" title="{{ menu.required_permission }}">Perm</span>
+                                            {% endif %}
+                                            {% if menu.required_group %}
+                                                <span class="badge bg-primary" title="{{ menu.required_group }}">Grupo</span>
+                                            {% endif %}
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <div class="btn-group btn-group-sm">
+                                            <a href="{% url 'config:menu-edit' menu.pk %}" class="btn btn-outline-primary" title="Editar">
+                                                <i class="fas fa-edit"></i>
+                                            </a>
+                                            <a href="{% url 'config:menu-delete' menu.pk %}" class="btn btn-outline-danger" title="Excluir">
+                                                <i class="fas fa-trash"></i>
+                                            </a>
+                                        </div>
+                                    </td>
+                                </tr>
+                                
+                                <!-- Mostrar submenus -->
+                                {% for submenu in menu.children.all %}
+                                    <tr class="table-light">
+                                        <td class="ps-4">
+                                            <i class="fas fa-arrow-right text-muted me-1"></i>
+                                            {{ submenu.title }}
+                                            {% if submenu.badge_text %}
+                                                <span class="badge bg-{{ submenu.badge_color|default:'primary' }} ms-1">{{ submenu.badge_text }}</span>
+                                            {% endif %}
+                                        </td>
+                                        <td>
+                                            {% if submenu.url %}
+                                                <code class="small">{{ submenu.url }}</code>
+                                                {% if submenu.is_external %}
+                                                    <i class="fas fa-external-link-alt text-muted ms-1" title="Link externo"></i>
+                                                {% endif %}
+                                            {% else %}
+                                                <span class="text-muted">-</span>
+                                            {% endif %}
+                                        </td>
+                                        <td>
+                                            {% if submenu.icon %}
+                                                <i class="{{ submenu.icon }} me-1"></i>
+                                                <small class="text-muted">{{ submenu.icon }}</small>
+                                            {% else %}
+                                                <span class="text-muted">-</span>
+                                            {% endif %}
+                                        </td>
+                                        <td>{{ submenu.order }}</td>
+                                        <td>
+                                            {% if submenu.is_active %}
+                                                <span class="badge bg-success">Ativo</span>
+                                            {% else %}
+                                                <span class="badge bg-danger">Inativo</span>
+                                            {% endif %}
+                                        </td>
+                                        <td>
+                                            <div class="d-flex flex-wrap gap-1">
+                                                {% if submenu.staff_only %}
+                                                    <span class="badge bg-warning text-dark">Staff</span>
+                                                {% endif %}
+                                                {% if submenu.authenticated_only %}
+                                                    <span class="badge bg-info">Auth</span>
+                                                {% endif %}
+                                                {% if submenu.required_permission %}
+                                                    <span class="badge bg-secondary" title="{{ submenu.required_permission }}">Perm</span>
+                                                {% endif %}
+                                                {% if submenu.required_group %}
+                                                    <span class="badge bg-primary" title="{{ submenu.required_group }}">Grupo</span>
+                                                {% endif %}
+                                            </div>
+                                        </td>
+                                        <td>
+                                            <div class="btn-group btn-group-sm">
+                                                <a href="{% url 'config:menu-edit' submenu.pk %}" class="btn btn-outline-primary" title="Editar">
+                                                    <i class="fas fa-edit"></i>
+                                                </a>
+                                                <a href="{% url 'config:menu-delete' submenu.pk %}" class="btn btn-outline-danger" title="Excluir">
+                                                    <i class="fas fa-trash"></i>
+                                                </a>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                {% endfor %}
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            {% endfor %}
+        </div>
+    </div>
+
+{% else %}
+    <div class="text-center py-5">
+        <i class="fas fa-bars fa-3x text-muted mb-3"></i>
+        <h4>Nenhum menu encontrado</h4>
+        <p class="text-muted">Crie seu primeiro menu para personalizar a navegação.</p>
+        <a href="{% url 'config:menu-create' %}" class="btn btn-primary">
+            <i class="fas fa-plus"></i> Criar Primeiro Menu
+        </a>
+    </div>
+{% endif %}
+
+{% endblock %}

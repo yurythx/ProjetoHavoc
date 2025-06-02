@@ -1,0 +1,151 @@
+{% extends "config/base_config.html" %}
+
+{% block config_title %}Variáveis de Ambiente{% endblock %}
+{% block config_description %}Gerencie as variáveis de ambiente do sistema{% endblock %}
+
+{% block config_content %}
+
+<!-- Filtros -->
+<div class="card mb-4">
+    <div class="card-body">
+        <h5 class="card-title">Filtros</h5>
+        <form method="get" class="row g-3">
+            <div class="col-md-4">
+                <label for="key" class="form-label">Chave</label>
+                <input type="text" name="key" id="key" class="form-control" value="{{ request.GET.key }}" placeholder="Filtrar por chave...">
+            </div>
+            <div class="col-md-4">
+                <label for="is_active" class="form-label">Status</label>
+                <select name="is_active" id="is_active" class="form-select">
+                    <option value="">Todos</option>
+                    <option value="true" {% if request.GET.is_active == 'true' %}selected{% endif %}>Ativos</option>
+                    <option value="false" {% if request.GET.is_active == 'false' %}selected{% endif %}>Inativos</option>
+                </select>
+            </div>
+            <div class="col-md-4 d-flex align-items-end">
+                <button type="submit" class="btn btn-primary me-2">
+                    <i class="fas fa-filter"></i> Filtrar
+                </button>
+                <a href="{% url 'config:env-variables' %}" class="btn btn-outline-secondary">
+                    <i class="fas fa-times"></i> Limpar
+                </a>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Ações -->
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <h4>Variáveis de Ambiente</h4>
+    <div>
+        <a href="{% url 'config:env-variable-create' %}" class="btn btn-success">
+            <i class="fas fa-plus"></i> Nova Variável
+        </a>
+        <a href="{% url 'config:env-variables-export' %}" class="btn btn-outline-primary">
+            <i class="fas fa-download"></i> Exportar
+        </a>
+        <a href="{% url 'config:env-variables-import' %}" class="btn btn-outline-secondary">
+            <i class="fas fa-upload"></i> Importar
+        </a>
+    </div>
+</div>
+
+{% if variables %}
+    <div class="card">
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-hover">
+                    <thead class="table-light">
+                        <tr>
+                            <th>Chave</th>
+                            <th>Valor</th>
+                            <th>Descrição</th>
+                            <th>Status</th>
+                            <th>Atualizado em</th>
+                            <th>Ações</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for variable in variables %}
+                            <tr>
+                                <td>
+                                    <code>{{ variable.key }}</code>
+                                    {% if variable.is_sensitive %}
+                                        <i class="fas fa-lock text-warning ms-1" title="Sensível"></i>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    {% if variable.is_sensitive %}
+                                        <span class="text-muted">••••••••</span>
+                                    {% else %}
+                                        <code class="small">{{ variable.value|truncatechars:30 }}</code>
+                                    {% endif %}
+                                </td>
+                                <td>{{ variable.description|default:"-"|truncatechars:50 }}</td>
+                                <td>
+                                    {% if variable.is_active %}
+                                        <span class="badge bg-success">Ativo</span>
+                                    {% else %}
+                                        <span class="badge bg-danger">Inativo</span>
+                                    {% endif %}
+                                </td>
+                                <td>{{ variable.updated_at|date:"d/m/Y H:i" }}</td>
+                                <td>
+                                    <div class="btn-group btn-group-sm">
+                                        <a href="{% url 'config:env-variable-edit' variable.pk %}" class="btn btn-outline-primary" title="Editar">
+                                            <i class="fas fa-edit"></i>
+                                        </a>
+                                        <a href="{% url 'config:env-variable-delete' variable.pk %}" class="btn btn-outline-danger" title="Excluir">
+                                            <i class="fas fa-trash"></i>
+                                        </a>
+                                    </div>
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- Paginação -->
+    {% if is_paginated %}
+        <nav aria-label="Paginação de variáveis" class="mt-3">
+            <ul class="pagination justify-content-center">
+                {% if page_obj.has_previous %}
+                    <li class="page-item">
+                        <a class="page-link" href="?page=1{% if request.GET.key %}&key={{ request.GET.key }}{% endif %}{% if request.GET.is_active %}&is_active={{ request.GET.is_active }}{% endif %}">Primeira</a>
+                    </li>
+                    <li class="page-item">
+                        <a class="page-link" href="?page={{ page_obj.previous_page_number }}{% if request.GET.key %}&key={{ request.GET.key }}{% endif %}{% if request.GET.is_active %}&is_active={{ request.GET.is_active }}{% endif %}">Anterior</a>
+                    </li>
+                {% endif %}
+
+                <li class="page-item active">
+                    <span class="page-link">{{ page_obj.number }} de {{ page_obj.paginator.num_pages }}</span>
+                </li>
+
+                {% if page_obj.has_next %}
+                    <li class="page-item">
+                        <a class="page-link" href="?page={{ page_obj.next_page_number }}{% if request.GET.key %}&key={{ request.GET.key }}{% endif %}{% if request.GET.is_active %}&is_active={{ request.GET.is_active }}{% endif %}">Próxima</a>
+                    </li>
+                    <li class="page-item">
+                        <a class="page-link" href="?page={{ page_obj.paginator.num_pages }}{% if request.GET.key %}&key={{ request.GET.key }}{% endif %}{% if request.GET.is_active %}&is_active={{ request.GET.is_active }}{% endif %}">Última</a>
+                    </li>
+                {% endif %}
+            </ul>
+        </nav>
+    {% endif %}
+
+{% else %}
+    <div class="text-center py-5">
+        <i class="fas fa-cog fa-3x text-muted mb-3"></i>
+        <h4>Nenhuma variável de ambiente encontrada</h4>
+        <p class="text-muted">Configure variáveis de ambiente para o sistema.</p>
+        <a href="{% url 'config:env-variable-create' %}" class="btn btn-primary">
+            <i class="fas fa-plus"></i> Criar Primeira Variável
+        </a>
+    </div>
+{% endif %}
+
+{% endblock %}

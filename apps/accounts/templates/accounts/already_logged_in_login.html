@@ -1,0 +1,248 @@
+{% extends "base.html" %}
+
+{% block title %}Já Logado - Login{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <h1 class="mb-4 text-center">Login Não Necessário</h1>
+
+    <!-- Aviso Principal -->
+    <div class="row justify-content-center">
+        <div class="col-md-8 col-lg-6">
+            <div class="card mb-4 border-success">
+                <div class="card-header bg-success text-white d-flex align-items-center justify-content-center">
+                    <h2 class="h5 mb-0">
+                        <i class="fas fa-check-circle me-2"></i>
+                        Você já está logado!
+                    </h2>
+                </div>
+                <div class="card-body text-center">
+                    <div class="mb-4">
+                        <i class="fas fa-user-check text-success fa-4x mb-3"></i>
+                        <h4 class="text-success">Sessão Ativa</h4>
+                        <p class="text-muted">
+                            Você tentou acessar a página de login, mas já está autenticado no sistema como 
+                            <strong>{{ user.get_full_name|default:user.username }}</strong>.
+                        </p>
+                    </div>
+                    
+                    <div class="alert alert-success">
+                        <i class="fas fa-info-circle me-2"></i>
+                        <strong>Tudo certo!</strong><br>
+                        Sua sessão está ativa e você pode continuar usando o sistema normalmente.
+                    </div>
+                </div>
+            </div>
+
+            <!-- Informações da Sessão Atual -->
+            <div class="card mb-4">
+                <div class="card-header d-flex align-items-center">
+                    <h2 class="h5 mb-0">
+                        <i class="fas fa-user-circle me-2"></i>
+                        Sessão Atual
+                    </h2>
+                </div>
+                <div class="card-body">
+                    <div class="row align-items-center">
+                        <div class="col-md-3 text-center mb-3 mb-md-0">
+                            <div class="user-avatar rounded-circle mx-auto d-flex align-items-center justify-content-center {% if not user.avatar %}bg-success{% endif %}" style="width: 80px; height: 80px;">
+                                {% if user.avatar %}
+                                    <img src="{{ user.avatar.url }}" alt="Avatar" class="rounded-circle" style="width: 80px; height: 80px; object-fit: cover;">
+                                {% else %}
+                                    <i class="fas fa-user text-white fa-2x"></i>
+                                {% endif %}
+                            </div>
+                        </div>
+                        <div class="col-md-9">
+                            <h5 class="mb-2">{{ user.get_full_name|default:user.username }}</h5>
+                            <p class="text-muted mb-2">
+                                <i class="fas fa-envelope me-2"></i>{{ user.email }}
+                            </p>
+                            <p class="text-muted mb-2">
+                                <i class="fas fa-users me-2"></i>
+                                {% for group in user.groups.all %}
+                                    <span class="badge bg-secondary me-1">{{ group.name }}</span>
+                                {% empty %}
+                                    <span class="text-muted">Nenhum grupo</span>
+                                {% endfor %}
+                            </p>
+                            {% if user.last_login %}
+                            <p class="text-muted mb-0">
+                                <i class="fas fa-clock me-2"></i>Login atual desde: {{ user.last_login|date:"d/m/Y H:i" }}
+                            </p>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Ações Rápidas -->
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h2 class="h5 mb-0">
+                        <i class="fas fa-bolt me-2"></i>
+                        Ações Rápidas
+                    </h2>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <div class="d-flex align-items-center p-3 border rounded h-100">
+                                <div class="me-3">
+                                    <i class="fas fa-tachometer-alt text-primary fa-2x"></i>
+                                </div>
+                                <div class="flex-grow-1">
+                                    <h6 class="mb-2">Meu Perfil</h6>
+                                    <p class="text-muted small mb-2">Visualizar informações da conta</p>
+                                    <a href="{% url 'accounts:profile' %}" class="btn btn-sm btn-outline-primary">
+                                        <i class="fas fa-user me-1"></i>Acessar
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <div class="d-flex align-items-center p-3 border rounded h-100">
+                                <div class="me-3">
+                                    <i class="fas fa-home text-info fa-2x"></i>
+                                </div>
+                                <div class="flex-grow-1">
+                                    <h6 class="mb-2">Página Inicial</h6>
+                                    <p class="text-muted small mb-2">Voltar ao início do sistema</p>
+                                    <a href="{% url 'pages:home' %}" class="btn btn-sm btn-outline-info">
+                                        <i class="fas fa-home me-1"></i>Início
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Opções de Conta -->
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h2 class="h5 mb-0">
+                        <i class="fas fa-user-cog me-2"></i>
+                        Gerenciar Conta
+                    </h2>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <div class="d-flex align-items-center p-3 border rounded h-100">
+                                <div class="me-3">
+                                    <i class="fas fa-edit text-success fa-2x"></i>
+                                </div>
+                                <div class="flex-grow-1">
+                                    <h6 class="mb-2">Editar Perfil</h6>
+                                    <p class="text-muted small mb-2">Atualizar informações pessoais</p>
+                                    <a href="{% url 'accounts:edit_profile' %}" class="btn btn-sm btn-outline-success">
+                                        <i class="fas fa-edit me-1"></i>Editar
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <div class="d-flex align-items-center p-3 border rounded h-100">
+                                <div class="me-3">
+                                    <i class="fas fa-key text-warning fa-2x"></i>
+                                </div>
+                                <div class="flex-grow-1">
+                                    <h6 class="mb-2">Alterar Senha</h6>
+                                    <p class="text-muted small mb-2">Modificar senha de acesso</p>
+                                    <a href="{% url 'accounts:password_change_request' %}" class="btn btn-sm btn-outline-warning">
+                                        <i class="fas fa-key me-1"></i>Alterar
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Trocar de Conta -->
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h2 class="h5 mb-0">
+                        <i class="fas fa-exchange-alt me-2"></i>
+                        Trocar de Conta
+                    </h2>
+                </div>
+                <div class="card-body">
+                    <div class="alert alert-warning">
+                        <i class="fas fa-exclamation-triangle me-2"></i>
+                        <strong>Precisa usar uma conta diferente?</strong><br>
+                        Se você deseja fazer login com outra conta, primeiro faça logout da conta atual.
+                    </div>
+                    
+                    <div class="text-center">
+                        <button type="button" class="btn btn-outline-danger" onclick="showLogoutModal()">
+                            <i class="fas fa-sign-out-alt me-2"></i>Fazer Logout e Trocar de Conta
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Informações de Segurança -->
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h2 class="h5 mb-0">
+                        <i class="fas fa-shield-alt me-2"></i>
+                        Segurança da Sessão
+                    </h2>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <h6><i class="fas fa-check-circle text-success me-2"></i>Sessão Segura</h6>
+                            <ul class="small text-muted">
+                                <li>Conexão autenticada</li>
+                                <li>Dados protegidos</li>
+                                <li>Sessão válida</li>
+                            </ul>
+                        </div>
+                        <div class="col-md-6">
+                            <h6><i class="fas fa-clock text-info me-2"></i>Tempo de Sessão</h6>
+                            <p class="small text-muted">
+                                Sua sessão expira automaticamente por segurança. 
+                                Mantenha-se ativo para não perder o acesso.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal de Logout -->
+<div class="modal fade" id="logoutModal" tabindex="-1" aria-labelledby="logoutModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header bg-danger text-white">
+                <h5 class="modal-title" id="logoutModalLabel">
+                    <i class="fas fa-sign-out-alt me-2"></i>Confirmar Logout
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p>Tem certeza que deseja sair da sua conta atual?</p>
+                <p class="text-muted small">Após o logout, você será redirecionado para a página de login onde poderá entrar com uma conta diferente.</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                <a href="{% url 'accounts:logout' %}" class="btn btn-danger">
+                    <i class="fas fa-sign-out-alt me-1"></i>Confirmar Logout
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+function showLogoutModal() {
+    var logoutModal = new bootstrap.Modal(document.getElementById('logoutModal'));
+    logoutModal.show();
+}
+</script>
+{% endblock %}

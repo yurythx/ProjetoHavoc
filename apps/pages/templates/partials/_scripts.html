@@ -1,0 +1,313 @@
+<!-- Bootstrap JS -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
+        integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
+
+<!-- Projeto Havoc Core Scripts - Otimizado -->
+<script>
+/**
+ * Projeto Havoc Core JavaScript - Apenas funcionalidades essenciais
+ */
+
+// Variáveis globais
+const isUserAuthenticated = {{ user.is_authenticated|yesno:"true,false" }};
+const currentUser = isUserAuthenticated ? "{{ user.get_full_name|default:user.username }}" : null;
+
+document.addEventListener('DOMContentLoaded', function() {
+    // Inicializar componentes essenciais
+    initializeAlerts();
+    initializePasswordToggles();
+    initializeFormValidation();
+    initializeBootstrapComponents();
+    initializeLoginCheck();
+});
+
+/**
+ * Auto-hide alerts
+ */
+function initializeAlerts() {
+    const alerts = document.querySelectorAll('.alert:not(.alert-permanent)');
+    alerts.forEach(function(alert) {
+        setTimeout(function() {
+            if (alert && alert.parentNode) {
+                const bsAlert = new bootstrap.Alert(alert);
+                bsAlert.close();
+            }
+        }, 5000);
+    });
+}
+
+/**
+ * Password toggle functionality
+ */
+function initializePasswordToggles() {
+    const passwordToggles = document.querySelectorAll('.password-toggle');
+    passwordToggles.forEach(function(toggle) {
+        toggle.addEventListener('click', function() {
+            const targetId = this.getAttribute('data-target');
+            const passwordField = document.getElementById(targetId);
+            const icon = this.querySelector('i');
+
+            if (!passwordField || !icon) return;
+
+            const currentType = passwordField.getAttribute('type');
+            const newType = currentType === 'password' ? 'text' : 'password';
+
+            passwordField.setAttribute('type', newType);
+
+            if (newType === 'text') {
+                icon.classList.remove('fa-eye');
+                icon.classList.add('fa-eye-slash');
+            } else {
+                icon.classList.remove('fa-eye-slash');
+                icon.classList.add('fa-eye');
+            }
+        });
+    });
+}
+
+/**
+ * Form validation
+ */
+function initializeFormValidation() {
+    const forms = document.querySelectorAll('.needs-validation');
+    forms.forEach(function(form) {
+        form.addEventListener('submit', function(event) {
+            if (!form.checkValidity()) {
+                event.preventDefault();
+                event.stopPropagation();
+            }
+            form.classList.add('was-validated');
+        });
+    });
+}
+
+/**
+ * Bootstrap components
+ */
+function initializeBootstrapComponents() {
+    // Tooltips
+    const tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+    tooltipTriggerList.map(function(tooltipTriggerEl) {
+        return new bootstrap.Tooltip(tooltipTriggerEl);
+    });
+
+    // Popovers
+    const popoverTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="popover"]'));
+    popoverTriggerList.map(function(popoverTriggerEl) {
+        return new bootstrap.Popover(popoverTriggerEl);
+    });
+}
+
+/**
+ * Verificação de login - interceptar tentativas de login quando já logado
+ */
+function initializeLoginCheck() {
+    // Interceptar formulários de login
+    const loginForms = document.querySelectorAll('form[action*="login"]');
+    loginForms.forEach(function(form) {
+        form.addEventListener('submit', function(event) {
+            if (isUserAuthenticated) {
+                event.preventDefault();
+                showAlreadyLoggedInModal();
+            }
+        });
+    });
+
+    // Interceptar links para página de login
+    const loginLinks = document.querySelectorAll('a[href*="login"]');
+    loginLinks.forEach(function(link) {
+        link.addEventListener('click', function(event) {
+            if (isUserAuthenticated) {
+                event.preventDefault();
+                showAlreadyLoggedInModal();
+            }
+        });
+    });
+}
+
+/**
+ * Modal para usuário já logado
+ */
+function showAlreadyLoggedInModal() {
+    const modalHtml = `
+        <div class="modal fade" id="alreadyLoggedModal" tabindex="-1" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content">
+                    <div class="modal-header bg-warning text-dark">
+                        <h5 class="modal-title">
+                            <i class="fas fa-exclamation-triangle me-2"></i>
+                            Usuário Já Logado
+                        </h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="text-center mb-3">
+                            <i class="fas fa-user-check fa-3x text-warning"></i>
+                        </div>
+                        <p class="text-center mb-3">
+                            <strong>Você já está logado como:</strong><br>
+                            <span class="text-primary fs-5">${currentUser}</span>
+                        </p>
+                        <div class="alert alert-info">
+                            <i class="fas fa-info-circle me-2"></i>
+                            Para fazer login com uma conta diferente, você precisa fazer logout primeiro.
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                            <i class="fas fa-times me-1"></i>Continuar Logado
+                        </button>
+                        <button type="button" class="btn btn-danger" onclick="showLogoutConfirmModal()">
+                            <i class="fas fa-sign-out-alt me-1"></i>Fazer Logout
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    `;
+
+    // Remover modal existente se houver
+    const existingModal = document.getElementById('alreadyLoggedModal');
+    if (existingModal) {
+        existingModal.remove();
+    }
+
+    // Adicionar modal ao DOM
+    document.body.insertAdjacentHTML('beforeend', modalHtml);
+
+    // Mostrar modal
+    const modal = new bootstrap.Modal(document.getElementById('alreadyLoggedModal'));
+    modal.show();
+
+    // Remover modal do DOM quando fechado
+    document.getElementById('alreadyLoggedModal').addEventListener('hidden.bs.modal', function() {
+        this.remove();
+    });
+}
+
+/**
+ * Modal de confirmação de logout
+ */
+function showLogoutConfirmModal() {
+    // Fechar modal anterior
+    const alreadyLoggedModal = bootstrap.Modal.getInstance(document.getElementById('alreadyLoggedModal'));
+    if (alreadyLoggedModal) {
+        alreadyLoggedModal.hide();
+    }
+
+    const modalHtml = `
+        <div class="modal fade" id="logoutConfirmModal" tabindex="-1" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content">
+                    <div class="modal-header bg-danger text-white">
+                        <h5 class="modal-title">
+                            <i class="fas fa-sign-out-alt me-2"></i>
+                            Confirmar Logout
+                        </h5>
+                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="text-center mb-3">
+                            <i class="fas fa-question-circle fa-3x text-danger"></i>
+                        </div>
+                        <p class="text-center mb-3">
+                            Tem certeza que deseja sair do sistema?
+                        </p>
+                        <div class="alert alert-warning">
+                            <i class="fas fa-exclamation-triangle me-2"></i>
+                            Você precisará fazer login novamente para acessar sua conta.
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                            <i class="fas fa-times me-1"></i>Cancelar
+                        </button>
+                        <form method="post" action="/accounts/logout/" class="d-inline">
+                            <input type="hidden" name="csrfmiddlewaretoken" value="${csrftoken}">
+                            <button type="submit" class="btn btn-danger">
+                                <i class="fas fa-sign-out-alt me-1"></i>Sim, Fazer Logout
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    `;
+
+    // Remover modal existente se houver
+    const existingModal = document.getElementById('logoutConfirmModal');
+    if (existingModal) {
+        existingModal.remove();
+    }
+
+    // Adicionar modal ao DOM
+    document.body.insertAdjacentHTML('beforeend', modalHtml);
+
+    // Mostrar modal
+    const modal = new bootstrap.Modal(document.getElementById('logoutConfirmModal'));
+    modal.show();
+
+    // Remover modal do DOM quando fechado
+    document.getElementById('logoutConfirmModal').addEventListener('hidden.bs.modal', function() {
+        this.remove();
+    });
+}
+
+/**
+ * Função global para logout (chamada pelos links de logout)
+ */
+function confirmLogout() {
+    showLogoutConfirmModal();
+}
+
+/**
+ * CSRF Token para requisições AJAX
+ */
+function getCookie(name) {
+    let cookieValue = null;
+    if (document.cookie && document.cookie !== '') {
+        const cookies = document.cookie.split(';');
+        for (let i = 0; i < cookies.length; i++) {
+            const cookie = cookies[i].trim();
+            if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                break;
+            }
+        }
+    }
+    return cookieValue;
+}
+
+// Configurar CSRF para fetch
+const csrftoken = getCookie('csrftoken');
+window.csrftoken = csrftoken;
+
+/**
+ * Sistema de notificações
+ */
+function showNotification(message, type = 'info', duration = 5000) {
+    const alertDiv = document.createElement('div');
+    alertDiv.className = `alert alert-${type} alert-dismissible fade show position-fixed`;
+    alertDiv.style.cssText = 'top: 20px; right: 20px; z-index: 9999; min-width: 300px;';
+    alertDiv.innerHTML = `
+        ${message}
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    `;
+
+    document.body.appendChild(alertDiv);
+
+    setTimeout(function() {
+        if (alertDiv.parentNode) {
+            alertDiv.remove();
+        }
+    }, duration);
+}
+
+// Exportar funções globais
+window.confirmLogout = confirmLogout;
+window.showNotification = showNotification;
+window.getCookie = getCookie;
+</script>
+
+<!-- Extra JS -->
+{% block extra_js %}{% endblock %}

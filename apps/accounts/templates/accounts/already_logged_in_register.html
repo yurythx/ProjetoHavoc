@@ -1,0 +1,211 @@
+{% extends "base.html" %}
+
+{% block title %}Já Logado - Registro{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <h1 class="mb-4 text-center">Registro Não Disponível</h1>
+
+    <!-- Aviso Principal -->
+    <div class="row justify-content-center">
+        <div class="col-md-8 col-lg-6">
+            <div class="card mb-4 border-warning">
+                <div class="card-header bg-warning text-dark d-flex align-items-center justify-content-center">
+                    <h2 class="h5 mb-0">
+                        <i class="fas fa-exclamation-triangle me-2"></i>
+                        Você já está logado!
+                    </h2>
+                </div>
+                <div class="card-body text-center">
+                    <div class="mb-4">
+                        <i class="fas fa-user-check text-warning fa-4x mb-3"></i>
+                        <h4 class="text-warning">Acesso Restrito</h4>
+                        <p class="text-muted">
+                            Você tentou acessar a página de registro, mas já está logado no sistema como 
+                            <strong>{{ user.get_full_name|default:user.username }}</strong>.
+                        </p>
+                    </div>
+                    
+                    <div class="alert alert-info">
+                        <i class="fas fa-info-circle me-2"></i>
+                        <strong>Por que não posso me registrar?</strong><br>
+                        Por motivos de segurança, usuários já autenticados não podem criar novas contas. 
+                        Isso previne registros acidentais e mantém a integridade do sistema.
+                    </div>
+                </div>
+            </div>
+
+            <!-- Informações do Usuário Atual -->
+            <div class="card mb-4">
+                <div class="card-header d-flex align-items-center">
+                    <h2 class="h5 mb-0">
+                        <i class="fas fa-user me-2"></i>
+                        Sua Conta Atual
+                    </h2>
+                </div>
+                <div class="card-body">
+                    <div class="row align-items-center">
+                        <div class="col-md-3 text-center mb-3 mb-md-0">
+                            <div class="user-avatar rounded-circle mx-auto d-flex align-items-center justify-content-center {% if not user.avatar %}bg-primary{% endif %}" style="width: 80px; height: 80px;">
+                                {% if user.avatar %}
+                                    <img src="{{ user.avatar.url }}" alt="Avatar" class="rounded-circle" style="width: 80px; height: 80px; object-fit: cover;">
+                                {% else %}
+                                    <i class="fas fa-user text-white fa-2x"></i>
+                                {% endif %}
+                            </div>
+                        </div>
+                        <div class="col-md-9">
+                            <h5 class="mb-2">{{ user.get_full_name|default:user.username }}</h5>
+                            <p class="text-muted mb-2">
+                                <i class="fas fa-envelope me-2"></i>{{ user.email }}
+                            </p>
+                            <p class="text-muted mb-2">
+                                <i class="fas fa-calendar me-2"></i>Membro desde {{ user.date_joined|date:"d/m/Y" }}
+                            </p>
+                            {% if user.last_login %}
+                            <p class="text-muted mb-0">
+                                <i class="fas fa-clock me-2"></i>Último acesso: {{ user.last_login|date:"d/m/Y H:i" }}
+                            </p>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Opções Disponíveis -->
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h2 class="h5 mb-0">
+                        <i class="fas fa-cogs me-2"></i>
+                        O que você pode fazer?
+                    </h2>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <div class="d-flex align-items-center p-3 border rounded h-100">
+                                <div class="me-3">
+                                    <i class="fas fa-user-edit text-primary fa-2x"></i>
+                                </div>
+                                <div class="flex-grow-1">
+                                    <h6 class="mb-2">Gerenciar Perfil</h6>
+                                    <p class="text-muted small mb-2">Edite suas informações pessoais</p>
+                                    <a href="{% url 'accounts:profile' %}" class="btn btn-sm btn-outline-primary">
+                                        <i class="fas fa-user me-1"></i>Ver Perfil
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <div class="d-flex align-items-center p-3 border rounded h-100">
+                                <div class="me-3">
+                                    <i class="fas fa-edit text-success fa-2x"></i>
+                                </div>
+                                <div class="flex-grow-1">
+                                    <h6 class="mb-2">Editar Informações</h6>
+                                    <p class="text-muted small mb-2">Atualize seus dados</p>
+                                    <a href="{% url 'accounts:edit_profile' %}" class="btn btn-sm btn-outline-success">
+                                        <i class="fas fa-edit me-1"></i>Editar
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <div class="d-flex align-items-center p-3 border rounded h-100">
+                                <div class="me-3">
+                                    <i class="fas fa-sign-out-alt text-warning fa-2x"></i>
+                                </div>
+                                <div class="flex-grow-1">
+                                    <h6 class="mb-2">Trocar de Conta</h6>
+                                    <p class="text-muted small mb-2">Sair e usar outra conta</p>
+                                    <button type="button" class="btn btn-sm btn-outline-warning" onclick="showLogoutModal()">
+                                        <i class="fas fa-sign-out-alt me-1"></i>Logout
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <div class="d-flex align-items-center p-3 border rounded h-100">
+                                <div class="me-3">
+                                    <i class="fas fa-home text-info fa-2x"></i>
+                                </div>
+                                <div class="flex-grow-1">
+                                    <h6 class="mb-2">Página Inicial</h6>
+                                    <p class="text-muted small mb-2">Voltar ao início</p>
+                                    <a href="{% url 'pages:home' %}" class="btn btn-sm btn-outline-info">
+                                        <i class="fas fa-home me-1"></i>Início
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Informações de Segurança -->
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h2 class="h5 mb-0">
+                        <i class="fas fa-shield-alt me-2"></i>
+                        Informações de Segurança
+                    </h2>
+                </div>
+                <div class="card-body">
+                    <div class="alert alert-light border">
+                        <h6 class="alert-heading">
+                            <i class="fas fa-lock me-2"></i>Por que esta restrição existe?
+                        </h6>
+                        <ul class="mb-0">
+                            <li><strong>Prevenção de Contas Duplicadas:</strong> Evita que você crie múltiplas contas acidentalmente</li>
+                            <li><strong>Segurança:</strong> Protege contra tentativas de registro malicioso</li>
+                            <li><strong>Integridade dos Dados:</strong> Mantém a consistência do sistema</li>
+                            <li><strong>Experiência do Usuário:</strong> Evita confusão sobre qual conta usar</li>
+                        </ul>
+                    </div>
+                    
+                    <div class="text-center">
+                        <small class="text-muted">
+                            <i class="fas fa-question-circle me-1"></i>
+                            Se você precisa de uma nova conta, faça logout primeiro e então acesse a página de registro.
+                        </small>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal de Logout -->
+<div class="modal fade" id="logoutModal" tabindex="-1" aria-labelledby="logoutModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header bg-warning text-dark">
+                <h5 class="modal-title" id="logoutModalLabel">
+                    <i class="fas fa-sign-out-alt me-2"></i>Confirmar Logout
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p>Tem certeza que deseja sair da sua conta?</p>
+                <p class="text-muted small">Após o logout, você poderá acessar a página de registro para criar uma nova conta.</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                <a href="{% url 'accounts:logout' %}" class="btn btn-warning">
+                    <i class="fas fa-sign-out-alt me-1"></i>Confirmar Logout
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+function showLogoutModal() {
+    var logoutModal = new bootstrap.Modal(document.getElementById('logoutModal'));
+    logoutModal.show();
+}
+</script>
+{% endblock %}

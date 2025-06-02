@@ -1,0 +1,86 @@
+{% extends 'base.html' %}
+
+{% block title %}Página de Testes{% endblock %}
+
+{% block content %}
+<div class="test-page-container">
+    <h1>Página de Testes - App Accounts</h1>
+
+    {% if user.is_authenticated %}
+        <div class="auth-status">
+            <i class="fas fa-user-check"></i> Você está logado como: {{ user.email }}
+        </div>
+    {% endif %}
+
+    <div class="test-sections">
+        <!-- Autenticação -->
+        <div class="test-section">
+            <div class="section-header">
+                <h2><i class="fas fa-lock"></i> Autenticação</h2>
+            </div>
+            <div class="section-content">
+                <ul class="test-links">
+                    <li><a href="{% url 'accounts:login' %}" class="test-link auth-link">Login</a></li>
+                    <li><a href="{% url 'accounts:register' %}" class="test-link register-link">Registro</a></li>
+                    <li><a href="{% url 'accounts:logout' %}" class="test-link logout-link">Logout</a></li>
+                    <li><a href="{% url 'accounts:password_reset' %}" class="test-link reset-link">Redefinir Senha</a></li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- Perfil -->
+        <div class="test-section">
+            <div class="section-header">
+                <h2><i class="fas fa-user"></i> Perfil</h2>
+            </div>
+            <div class="section-content">
+                <ul class="test-links">
+                    <li><a href="{% url 'accounts:profile' %}" class="test-link profile-link">Ver Perfil</a></li>
+                    <li><a href="{% url 'accounts:edit_profile' %}" class="test-link edit-link">Editar Perfil</a></li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- Administração -->
+        <div class="test-section">
+            <div class="section-header">
+                <h2><i class="fas fa-cogs"></i> Administração</h2>
+            </div>
+            <div class="section-content">
+                <ul class="test-links">
+                    <li><a href="{% url 'accounts:admin_settings' %}" class="test-link admin-link">Configurações</a></li>
+                    <li><a href="{% url 'accounts:ldap_login' %}" class="test-link ldap-link">Login LDAP</a></li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <div class="user-info-section">
+        <h2><i class="fas fa-info-circle"></i> Informações do Usuário</h2>
+        <div class="user-info-card">
+            <div class="info-row">
+                <span class="info-label">Nome:</span>
+                <span class="info-value">{{ user.get_full_name }}</span>
+            </div>
+            <div class="info-row">
+                <span class="info-label">Email:</span>
+                <span class="info-value">{{ user.email }}</span>
+            </div>
+            <div class="info-row">
+                <span class="info-label">Telefone:</span>
+                <span class="info-value">{{ user.telefone }}</span>
+            </div>
+            <div class="info-row">
+                <span class="info-label">Email Verificado:</span>
+                <span class="info-value">{{ user.email_verificado|yesno:"Sim,Não" }}</span>
+            </div>
+            <div class="info-row">
+                <span class="info-label">Ativo:</span>
+                <span class="info-value">{{ user.is_active|yesno:"Sim,Não" }}</span>
+            </div>
+        </div>
+    </div>
+</div>
+
+{# CSS movido para arquivos modulares #}
+{% endblock %}

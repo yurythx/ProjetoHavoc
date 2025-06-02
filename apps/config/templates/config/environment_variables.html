@@ -1,0 +1,255 @@
+{% extends "config/base_config.html" %}
+{% load crispy_forms_tags %}
+
+{% block config_title %}Variáveis de Ambiente{% endblock %}
+{% block config_description %}Gerencie todas as variáveis de ambiente do sistema{% endblock %}
+
+{% block config_breadcrumb %}
+<li class="breadcrumb-item active">Variáveis de Ambiente</li>
+{% endblock %}
+
+{% block config_content %}
+
+<!-- Filtros e Ações -->
+<div class="config-card card mb-4">
+    <div class="card-header d-flex justify-content-between align-items-center">
+        <h5 class="mb-0">
+            <i class="fas fa-filter me-2"></i>Filtros e Ações
+        </h5>
+        <div>
+            <a href="{% url 'config:env-variable-create' %}" class="btn btn-primary btn-sm">
+                <i class="fas fa-plus me-1"></i>Nova Variável
+            </a>
+            <div class="btn-group" role="group">
+                <a href="{% url 'config:env-variables-export' %}" class="btn btn-success btn-sm">
+                    <i class="fas fa-download me-1"></i>Exportar
+                </a>
+                <a href="{% url 'config:env-variables-import' %}" class="btn btn-info btn-sm">
+                    <i class="fas fa-upload me-1"></i>Importar
+                </a>
+            </div>
+        </div>
+    </div>
+    <div class="card-body">
+        <form method="get" class="row g-3">
+            <div class="col-md-3">
+                {{ filter_form.category }}
+            </div>
+            <div class="col-md-2">
+                {{ filter_form.var_type }}
+            </div>
+            <div class="col-md-2">
+                {{ filter_form.is_required }}
+            </div>
+            <div class="col-md-2">
+                {{ filter_form.is_sensitive }}
+            </div>
+            <div class="col-md-3">
+                <div class="input-group">
+                    {{ filter_form.search }}
+                    <button class="btn btn-outline-secondary" type="submit">
+                        <i class="fas fa-search"></i>
+                    </button>
+                    <a href="{% url 'config:env-variables' %}" class="btn btn-outline-secondary">
+                        <i class="fas fa-times"></i>
+                    </a>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Estatísticas -->
+<div class="row mb-4">
+    <div class="col-md-3">
+        <div class="config-card card text-center">
+            <div class="card-body">
+                <h5 class="card-title">{{ stats.total }}</h5>
+                <p class="card-text text-muted">Total de Variáveis</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="config-card card text-center">
+            <div class="card-body">
+                <h5 class="card-title text-success">{{ stats.active }}</h5>
+                <p class="card-text text-muted">Ativas</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="config-card card text-center">
+            <div class="card-body">
+                <h5 class="card-title text-warning">{{ stats.required }}</h5>
+                <p class="card-text text-muted">Obrigatórias</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="config-card card text-center">
+            <div class="card-body">
+                <h5 class="card-title text-danger">{{ stats.sensitive }}</h5>
+                <p class="card-text text-muted">Sensíveis</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Lista de Variáveis por Categoria -->
+{% regroup variables by category as category_list %}
+
+{% for category in category_list %}
+<div class="config-card card mb-4">
+    <div class="card-header">
+        <h5 class="mb-0">
+            <i class="fas fa-folder me-2"></i>
+            {{ category.grouper|capfirst }}
+            <span class="badge bg-secondary ms-2">{{ category.list|length }}</span>
+        </h5>
+    </div>
+    <div class="card-body p-0">
+        <div class="table-responsive">
+            <table class="table table-hover mb-0">
+                <thead class="table-light">
+                    <tr>
+                        <th>Chave</th>
+                        <th>Valor</th>
+                        <th>Tipo</th>
+                        <th>Status</th>
+                        <th>Ações</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for variable in category.list %}
+                    <tr>
+                        <td>
+                            <strong>{{ variable.key }}</strong>
+                            {% if variable.is_required %}
+                                <span class="badge bg-warning ms-1" title="Obrigatória">
+                                    <i class="fas fa-exclamation"></i>
+                                </span>
+                            {% endif %}
+                            {% if variable.is_sensitive %}
+                                <span class="badge bg-danger ms-1" title="Sensível">
+                                    <i class="fas fa-lock"></i>
+                                </span>
+                            {% endif %}
+                            {% if variable.description %}
+                                <br><small class="text-muted">{{ variable.description|truncatechars:60 }}</small>
+                            {% endif %}
+                        </td>
+                        <td>
+                            <code class="small">{{ variable.get_display_value|default:"<vazio>" }}</code>
+                            {% if variable.default_value and not variable.value %}
+                                <br><small class="text-muted">Padrão: {{ variable.default_value }}</small>
+                            {% endif %}
+                        </td>
+                        <td>
+                            <span class="badge bg-info">{{ variable.get_var_type_display }}</span>
+                        </td>
+                        <td>
+                            {% if variable.is_active %}
+                                <span class="badge bg-success">Ativa</span>
+                            {% else %}
+                                <span class="badge bg-secondary">Inativa</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            <div class="btn-group btn-group-sm" role="group">
+                                <a href="{% url 'config:env-variable-edit' variable.pk %}"
+                                   class="btn btn-outline-primary" title="Editar">
+                                    <i class="fas fa-edit"></i>
+                                </a>
+                                <button type="button" class="btn btn-outline-danger"
+                                        data-bs-toggle="modal"
+                                        data-bs-target="#deleteModal{{ variable.pk }}"
+                                        title="Excluir">
+                                    <i class="fas fa-trash"></i>
+                                </button>
+                            </div>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<!-- Modal de Confirmação de Exclusão -->
+{% for variable in category.list %}
+<div class="modal fade" id="deleteModal{{ variable.pk }}" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Confirmar Exclusão</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <p>Tem certeza que deseja excluir a variável <strong>{{ variable.key }}</strong>?</p>
+                {% if variable.is_required %}
+                    <div class="alert alert-warning">
+                        <i class="fas fa-exclamation-triangle me-2"></i>
+                        Esta é uma variável obrigatória. Excluí-la pode afetar o funcionamento do sistema.
+                    </div>
+                {% endif %}
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                <form method="post" action="{% url 'config:env-variable-delete' variable.pk %}" class="d-inline">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-danger">
+                        <i class="fas fa-trash me-1"></i>Excluir
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endfor %}
+
+{% empty %}
+<div class="config-card card">
+    <div class="card-body text-center py-5">
+        <i class="fas fa-code fa-3x text-muted mb-3"></i>
+        <h5>Nenhuma variável encontrada</h5>
+        <p class="text-muted">Comece criando sua primeira variável de ambiente.</p>
+        <a href="{% url 'config:env-variable-create' %}" class="btn btn-primary">
+            <i class="fas fa-plus me-1"></i>Criar Primeira Variável
+        </a>
+    </div>
+</div>
+{% endfor %}
+
+<!-- Paginação -->
+{% if is_paginated %}
+<nav aria-label="Paginação">
+    <ul class="pagination justify-content-center">
+        {% if page_obj.has_previous %}
+            <li class="page-item">
+                <a class="page-link" href="?page=1">Primeira</a>
+            </li>
+            <li class="page-item">
+                <a class="page-link" href="?page={{ page_obj.previous_page_number }}">Anterior</a>
+            </li>
+        {% endif %}
+
+        <li class="page-item active">
+            <span class="page-link">
+                Página {{ page_obj.number }} de {{ page_obj.paginator.num_pages }}
+            </span>
+        </li>
+
+        {% if page_obj.has_next %}
+            <li class="page-item">
+                <a class="page-link" href="?page={{ page_obj.next_page_number }}">Próxima</a>
+            </li>
+            <li class="page-item">
+                <a class="page-link" href="?page={{ page_obj.paginator.num_pages }}">Última</a>
+            </li>
+        {% endif %}
+    </ul>
+</nav>
+{% endif %}
+
+{% endblock %}

@@ -1,0 +1,104 @@
+{% extends "base.html" %}
+{% load crispy_forms_tags %}
+
+{% block title %}Configurações de Autenticação{% endblock %}
+
+{% block content %}
+<div class="admin-settings-container">
+    <h2>Configurações de Autenticação</h2>
+    <p class="settings-subtitle">Gerencie as configurações de autenticação do sistema</p>
+
+    <!-- Configurações de Email -->
+    <div class="settings-section">
+        <h3>Configurações de Email</h3>
+        <form method="post" class="settings-form" id="email-settings-form">
+            {% csrf_token %}
+            <input type="hidden" name="form_type" value="email_settings">
+            <div class="form-group">
+                <label for="email_host">Servidor SMTP</label>
+                <input type="text" id="email_host" name="email_host" class="form-control" value="{{ email_settings.host }}">
+            </div>
+            <div class="form-group">
+                <label for="email_port">Porta SMTP</label>
+                <input type="number" id="email_port" name="email_port" class="form-control" value="{{ email_settings.port }}">
+            </div>
+            <div class="form-group">
+                <label for="email_user">Usuário SMTP</label>
+                <input type="text" id="email_user" name="email_user" class="form-control" value="{{ email_settings.user }}">
+            </div>
+            <div class="form-group">
+                <label for="email_password">Senha SMTP</label>
+                <input type="password" id="email_password" name="email_password" class="form-control">
+            </div>
+            <div class="form-actions">
+                <button type="submit" class="btn btn-primary">Salvar Configurações de Email</button>
+            </div>
+        </form>
+    </div>
+
+    <!-- Configurações de Autenticação Social -->
+    <div class="settings-section">
+        <h3>Autenticação Social</h3>
+        <form method="post" class="settings-form" id="social-settings-form">
+            {% csrf_token %}
+            <input type="hidden" name="form_type" value="social_settings">
+            
+            <!-- Google -->
+            <div class="social-provider">
+                <h4>Google</h4>
+                <div class="form-group">
+                    <label for="google_client_id">Client ID</label>
+                    <input type="text" id="google_client_id" name="google_client_id" class="form-control" value="{{ social_settings.google.client_id }}">
+                </div>
+                <div class="form-group">
+                    <label for="google_secret">Client Secret</label>
+                    <input type="password" id="google_secret" name="google_secret" class="form-control">
+                </div>
+            </div>
+
+            <!-- GitHub -->
+            <div class="social-provider">
+                <h4>GitHub</h4>
+                <div class="form-group">
+                    <label for="github_client_id">Client ID</label>
+                    <input type="text" id="github_client_id" name="github_client_id" class="form-control" value="{{ social_settings.github.client_id }}">
+                </div>
+                <div class="form-group">
+                    <label for="github_secret">Client Secret</label>
+                    <input type="password" id="github_secret" name="github_secret" class="form-control">
+                </div>
+            </div>
+
+            <div class="form-actions">
+                <button type="submit" class="btn btn-primary">Salvar Configurações Sociais</button>
+            </div>
+        </form>
+    </div>
+
+    <!-- Configurações LDAP -->
+    <div class="settings-section">
+        <h3>Configurações LDAP</h3>
+        <form method="post" class="settings-form" id="ldap-settings-form">
+            {% csrf_token %}
+            <input type="hidden" name="form_type" value="ldap_settings">
+            <div class="form-group">
+                <label for="ldap_server">Servidor LDAP</label>
+                <input type="text" id="ldap_server" name="ldap_server" class="form-control" value="{{ ldap_settings.server }}">
+            </div>
+            <div class="form-group">
+                <label for="ldap_port">Porta LDAP</label>
+                <input type="number" id="ldap_port" name="ldap_port" class="form-control" value="{{ ldap_settings.port }}">
+            </div>
+            <div class="form-group">
+                <label for="ldap_base_dn">Base DN</label>
+                <input type="text" id="ldap_base_dn" name="ldap_base_dn" class="form-control" value="{{ ldap_settings.base_dn }}">
+            </div>
+            <div class="form-actions">
+                <button type="submit" class="btn btn-primary">Salvar Configurações LDAP</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+{# CSS movido para arquivos modulares #}
+{% endblock %}

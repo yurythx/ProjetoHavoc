@@ -1,0 +1,40 @@
+{% if form.errors %}
+<div class="alert alert-error alert-dismissible fade show" role="alert">
+    <i class="fas fa-exclamation-circle"></i>
+    <strong>Por favor, corrija os erros abaixo:</strong>
+    
+    {% if form.non_field_errors %}
+    <ul class="error-list">
+        {% for error in form.non_field_errors %}
+        <li>{{ error }}</li>
+        {% endfor %}
+    </ul>
+    {% endif %}
+    
+    <button type="button" class="close" data-dismiss="alert" aria-label="Fechar">
+        <i class="fas fa-times"></i>
+    </button>
+</div>
+{% endif %}
+
+{% if messages %}
+    {% for message in messages %}
+    <div class="alert alert-dismissible fade show {% if message.tags == 'success' %}alert-success{% elif message.tags == 'error' %}alert-error{% elif message.tags == 'warning' %}alert-warning{% elif message.tags == 'info' %}alert-info{% else %}alert-info{% endif %}" role="alert">
+        {% if message.tags == 'success' %}
+            <i class="fas fa-check-circle"></i>
+        {% elif message.tags == 'error' %}
+            <i class="fas fa-exclamation-circle"></i>
+        {% elif message.tags == 'warning' %}
+            <i class="fas fa-exclamation-triangle"></i>
+        {% elif message.tags == 'info' %}
+            <i class="fas fa-info-circle"></i>
+        {% else %}
+            <i class="fas fa-bell"></i>
+        {% endif %}
+        {{ message }}
+        <button type="button" class="close" data-dismiss="alert" aria-label="Fechar">
+            <i class="fas fa-times"></i>
+        </button>
+    </div>
+    {% endfor %}
+{% endif %}

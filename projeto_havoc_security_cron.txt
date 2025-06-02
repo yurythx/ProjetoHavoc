@@ -1,0 +1,11 @@
+# Projeto Havoc Security System Cron Jobs
+
+# Executar auditoria de segurança diariamente às 2:00
+0 2 * * * cd C:\Users\Yuri\Desktop\Projetos\ProjetoHavoc && python scripts/security_test.py >> logs/cron_audit.log 2>&1
+
+# Executar teste de penetração semanalmente aos domingos às 3:00
+0 3 * * 0 cd C:\Users\Yuri\Desktop\Projetos\ProjetoHavoc && python scripts/penetration_test.py >> logs/cron_pentest.log 2>&1
+
+# Limpeza de logs antigos mensalmente
+0 4 1 * * find C:\Users\Yuri\Desktop\Projetos\ProjetoHavoc/logs -name "*.log" -mtime +30 -delete
+0 4 1 * * find C:\Users\Yuri\Desktop\Projetos\ProjetoHavoc/reports -name "*.json" -mtime +90 -delete

@@ -1,0 +1,134 @@
+{% extends "base.html" %}
+
+{% block title %}Acesso Negado (403) - Viixen{% endblock %}
+
+{% block extra_css %}
+<style>
+.error-container {
+    min-height: 70vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+}
+
+.error-code {
+    font-size: 8rem;
+    font-weight: bold;
+    background: linear-gradient(135deg, #dc3545 0%, #fd7e14 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    line-height: 1;
+    margin-bottom: 20px;
+}
+
+.error-icon {
+    font-size: 120px;
+    color: #dc3545;
+    opacity: 0.3;
+    margin-bottom: 30px;
+}
+
+.btn-home {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    border: none;
+    padding: 12px 30px;
+    border-radius: 25px;
+    color: white;
+    text-decoration: none;
+    transition: all 0.3s ease;
+    display: inline-block;
+}
+
+.btn-home:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+    color: white;
+}
+
+.suggestions {
+    background: white;
+    border-radius: 15px;
+    padding: 30px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+    margin-top: 40px;
+}
+
+.suggestion-link {
+    color: #667eea;
+    text-decoration: none;
+    transition: color 0.3s ease;
+}
+
+.suggestion-link:hover {
+    color: #764ba2;
+}
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="error-container">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-lg-8">
+                <div class="error-icon">
+                    <i class="fas fa-lock"></i>
+                </div>
+                <div class="error-code">403</div>
+                <h1 class="display-5 fw-bold mb-4">Acesso Negado</h1>
+                <p class="lead text-muted mb-4">
+                    Você não tem permissão para acessar esta página. Verifique suas credenciais ou entre em contato com o administrador.
+                </p>
+
+                <div class="mb-4">
+                    <a href="{% url 'pages:home' %}" class="btn-home me-3">
+                        <i class="fas fa-home me-2"></i>Voltar ao Início
+                    </a>
+                    <a href="{% url 'accounts:login' %}" class="btn btn-outline-primary">
+                        <i class="fas fa-sign-in-alt me-2"></i>Fazer Login
+                    </a>
+                </div>
+
+                <div class="suggestions">
+                    <h5 class="mb-3">O que você pode fazer:</h5>
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <div class="d-flex align-items-center">
+                                <i class="fas fa-sign-in-alt text-primary me-2"></i>
+                                <a href="{% url 'accounts:login' %}" class="suggestion-link">Fazer Login</a>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="d-flex align-items-center">
+                                <i class="fas fa-user-plus text-primary me-2"></i>
+                                <a href="{% url 'accounts:register' %}" class="suggestion-link">Criar Conta</a>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="d-flex align-items-center">
+                                <i class="fas fa-envelope text-primary me-2"></i>
+                                <a href="{% url 'pages:contato' %}" class="suggestion-link">Contatar Suporte</a>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="d-flex align-items-center">
+                                <i class="fas fa-home text-primary me-2"></i>
+                                <a href="{% url 'pages:home' %}" class="suggestion-link">Página Inicial</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="mt-4">
+                    <p class="text-muted small">
+                        Se você acredita que deveria ter acesso a esta página,
+                        <a href="{% url 'pages:contato' %}" class="suggestion-link">entre em contato com o administrador</a>.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

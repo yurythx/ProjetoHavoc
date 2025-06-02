@@ -1,0 +1,39 @@
+# Django Core
+Django==5.2.1
+python-decouple==3.8
+
+# Database
+dj-database-url==2.3.0
+
+# Authentication & Authorization
+django-allauth==65.8.0
+
+# Forms & UI
+django-crispy-forms==2.4
+crispy-bootstrap5==2025.4
+django-widget-tweaks==1.5.0
+
+# Security & Encryption
+cryptography==45.0.2
+
+# Image Processing
+Pillow==11.2.1
+
+# LDAP Support
+ldap3==2.9.1
+
+# HTTP Requests
+requests==2.32.3
+
+# JWT
+PyJWT==2.10.1
+
+# SMS (Twilio)
+twilio==9.6.1
+
+# Utilities
+sqlparse==0.5.3
+tzdata==2025.2
+
+# Development Dependencies
+mock==5.2.0

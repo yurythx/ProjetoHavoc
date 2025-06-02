@@ -1,0 +1,29 @@
+{% extends "accounts/emails/base_email.html" %}
+
+{% block email_title %}Ativação de Conta - Projeto Havoc{% endblock %}
+{% block email_header_title %}Ativação de Conta{% endblock %}
+{% block email_header_subtitle %}Confirme seu cadastro no Projeto Havoc{% endblock %}
+
+{% block email_content %}
+    <h2>Olá {{ user.get_username }},</h2>
+    <p>Obrigado por se registrar no <strong>Projeto Havoc</strong>!</p>
+    <p>Para ativar sua conta e começar a usar nosso sistema, clique no botão abaixo:</p>
+
+    <div class="btn-center">
+        <a href="{{ activation_link }}" class="btn" rel="noopener" target="_blank">
+            Ativar Conta
+        </a>
+    </div>
+
+    <div class="info-box">
+        <h3>Link de Ativação</h3>
+        <p>Se preferir, copie e cole o link abaixo no seu navegador:</p>
+        <div class="link-box">
+            <a href="{{ activation_link }}" rel="noopener" target="_blank">{{ activation_link }}</a>
+        </div>
+    </div>
+
+    <div class="warning-box">
+        <p><strong>Importante:</strong> Se você não criou essa conta, ignore este email.</p>
+    </div>
+{% endblock %}

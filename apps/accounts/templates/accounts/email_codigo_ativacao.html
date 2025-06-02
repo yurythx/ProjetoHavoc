@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Código de Ativação da Conta</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f8f9fa;
+        }
+        .container {
+            background: white;
+            padding: 40px;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+            padding-bottom: 20px;
+            border-bottom: 2px solid #e9ecef;
+        }
+        .logo {
+            font-size: 24px;
+            font-weight: bold;
+            color: #28a745;
+            margin-bottom: 10px;
+        }
+        .title {
+            color: #2c3e50;
+            font-size: 28px;
+            margin-bottom: 10px;
+        }
+        .subtitle {
+            color: #6c757d;
+            font-size: 16px;
+        }
+        .content {
+            margin: 30px 0;
+        }
+        .codigo-container {
+            background: #f8f9fa;
+            border: 2px dashed #28a745;
+            border-radius: 10px;
+            padding: 30px;
+            text-align: center;
+            margin: 30px 0;
+        }
+        .codigo {
+            font-size: 48px;
+            font-weight: bold;
+            color: #28a745;
+            letter-spacing: 8px;
+            font-family: 'Courier New', monospace;
+            margin: 20px 0;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.1);
+        }
+        .codigo-label {
+            font-size: 18px;
+            color: #495057;
+            margin-bottom: 10px;
+            font-weight: bold;
+        }
+        .codigo-info {
+            font-size: 14px;
+            color: #6c757d;
+            margin-top: 15px;
+        }
+        .info-box {
+            background: #e7f3ff;
+            border: 1px solid #b3d9ff;
+            color: #0c5460;
+            padding: 20px;
+            border-radius: 8px;
+            margin: 20px 0;
+        }
+        .warning {
+            background: #fff3cd;
+            border: 1px solid #ffeaa7;
+            color: #856404;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 20px 0;
+        }
+        .steps {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 8px;
+            margin: 20px 0;
+        }
+        .step {
+            display: flex;
+            align-items: center;
+            margin: 10px 0;
+            padding: 10px;
+            background: white;
+            border-radius: 5px;
+            border-left: 4px solid #28a745;
+        }
+        .step-number {
+            background: #28a745;
+            color: white;
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            margin-right: 15px;
+            flex-shrink: 0;
+        }
+        .footer {
+            text-align: center;
+            margin-top: 40px;
+            padding-top: 20px;
+            border-top: 1px solid #e9ecef;
+            color: #6c757d;
+            font-size: 14px;
+        }
+        .highlight {
+            background: #fff3cd;
+            padding: 15px;
+            border-radius: 8px;
+            border-left: 4px solid #ffc107;
+            margin: 20px 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="logo">🔐 Sistema de Gestão</div>
+            <h1 class="title">
+                {% if novo_codigo %}
+                    Novo Código de Ativação
+                {% else %}
+                    Código de Ativação da Conta
+                {% endif %}
+            </h1>
+            <p class="subtitle">
+                {% if novo_codigo %}
+                    Novo código solicitado com sucesso
+                {% else %}
+                    Bem-vindo ao nosso sistema!
+                {% endif %}
+            </p>
+        </div>
+
+        <div class="content">
+            <p>Olá <strong>{{ user.get_full_name|default:user.username }}</strong>,</p>
+
+            {% if novo_codigo %}
+                <p>Você solicitou um novo código de ativação para sua conta. Use o código abaixo para ativar sua conta:</p>
+            {% else %}
+                <p>Sua conta foi criada com sucesso! Para começar a usar o sistema, você precisa ativar sua conta usando o código abaixo:</p>
+            {% endif %}
+
+            <div class="codigo-container">
+                <div class="codigo-label">🔑 SEU CÓDIGO DE ATIVAÇÃO</div>
+                <div class="codigo">{{ codigo }}</div>
+                <div class="codigo-info">
+                    <strong>⏰ Válido por 30 minutos</strong><br>
+                    <small>Código gerado em: {{ "now"|date:"d/m/Y H:i" }}</small>
+                </div>
+            </div>
+
+            <div class="steps">
+                <h3 style="margin-top: 0; color: #28a745;">📋 Como ativar sua conta:</h3>
+
+                <div class="step">
+                    <div class="step-number">1</div>
+                    <div>
+                        <strong>Acesse a página de ativação</strong><br>
+                        <small>
+                            <a href="{{ activation_link }}"
+                               style="color: #28a745; text-decoration: none;">
+                                🔗 Clique aqui para ativar sua conta
+                            </a>
+                        </small>
+                    </div>
+                </div>
+
+                <div class="step">
+                    <div class="step-number">2</div>
+                    <div>
+                        <strong>Digite seu email</strong><br>
+                        <small>{{ user.email }}</small>
+                    </div>
+                </div>
+
+                <div class="step">
+                    <div class="step-number">3</div>
+                    <div>
+                        <strong>Insira o código de ativação</strong><br>
+                        <small>Digite exatamente: <code>{{ codigo }}</code></small>
+                    </div>
+                </div>
+
+                <div class="step">
+                    <div class="step-number">4</div>
+                    <div>
+                        <strong>Clique em "Ativar Conta"</strong><br>
+                        <small>Sua conta será ativada automaticamente</small>
+                    </div>
+                </div>
+            </div>
+
+            <div class="info-box">
+                <p><strong>📧 Detalhes da conta:</strong></p>
+                <p><strong>👤 Usuário:</strong> {{ user.username }}</p>
+                <p><strong>📧 Email:</strong> {{ user.email }}</p>
+                <p><strong>🕒 Data de criação:</strong> {{ user.date_joined|date:"d/m/Y H:i" }}</p>
+            </div>
+
+            <div class="warning">
+                <p><strong>⚠️ IMPORTANTE - Informações de Segurança:</strong></p>
+                <ul>
+                    <li><strong>Código único:</strong> Este código só pode ser usado uma vez</li>
+                    <li><strong>Validade:</strong> Expira em 30 minutos após o envio</li>
+                    <li><strong>Tentativas:</strong> Máximo de 5 tentativas por código</li>
+                    <li><strong>Novo código:</strong> Aguarde 5 minutos para solicitar outro</li>
+                    <li><strong>Não foi você?</strong> Ignore este email - a conta não será ativada</li>
+                </ul>
+            </div>
+
+            {% if novo_codigo %}
+                <div class="highlight">
+                    <p><strong>🔄 Código anterior invalidado:</strong> Apenas este novo código funcionará. O código anterior foi automaticamente cancelado por segurança.</p>
+                </div>
+            {% endif %}
+
+            <div class="info-box">
+                <p><strong>🆘 Precisa de ajuda?</strong></p>
+                <ul>
+                    <li><strong>Não recebeu o código?</strong> Verifique sua caixa de spam</li>
+                    <li><strong>Código expirado?</strong> Solicite um novo na página de ativação</li>
+                    <li><strong>Problemas técnicos?</strong> Entre em contato com o suporte</li>
+                    <li><strong>Esqueceu o email?</strong> Use o email que recebeu esta mensagem</li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="footer">
+            <p><strong>Este é um email automático de ativação, não responda a esta mensagem.</strong></p>
+            <p>Se você não criou uma conta em nosso sistema, pode ignorar este email com segurança.</p>
+            <p>© {{ "now"|date:"Y" }} Sistema de Gestão - Todos os direitos reservados</p>
+        </div>
+    </div>
+</body>
+</html>

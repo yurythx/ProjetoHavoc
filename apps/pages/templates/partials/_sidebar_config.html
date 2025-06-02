@@ -1,0 +1,268 @@
+<!-- Config Sidebar -->
+<div class="sidebar p-3">
+    <!-- User Info -->
+    <div class="text-center mb-4">
+        {% if user.avatar %}
+            <img src="{{ user.avatar.url }}" alt="Avatar" class="rounded-circle mb-2"
+                 style="width: 80px; height: 80px; object-fit: cover;">
+        {% else %}
+            <div class="bg-white bg-opacity-25 rounded-circle mx-auto mb-2 d-flex align-items-center justify-content-center"
+                 style="width: 80px; height: 80px;">
+                <i class="fas fa-user text-white" style="font-size: 2rem;"></i>
+            </div>
+        {% endif %}
+        <h6 class="mb-1">{{ user.get_full_name|default:user.username }}</h6>
+        <small class="text-white-50">{{ user.email }}</small>
+        <div class="badge bg-warning mt-1">
+            <i class="fas fa-cogs me-1"></i>Administrador
+        </div>
+    </div>
+    <hr class="text-white-50">
+
+    <!-- Navigation Menu -->
+    <nav class="nav flex-column">
+        <!-- Voltar ao Dashboard -->
+        <a class="nav-link" href="{% url 'pages:home' %}">
+            <i class="fas fa-arrow-left me-2"></i>
+            Voltar ao Dashboard
+        </a>
+
+        <hr class="text-white-50 my-2">
+
+        <!-- Configurações Gerais -->
+        <div class="nav-section">
+            <h6 class="nav-header text-white-50 text-uppercase small fw-bold mb-2">
+                <i class="fas fa-cogs me-1"></i>Configurações Gerais
+            </h6>
+
+            <a class="nav-link {% if 'config' in request.resolver_match.url_name %}active{% endif %}"
+               href="{% url 'config:config' %}">
+                <i class="fas fa-sliders-h me-2"></i>
+                Sistema
+            </a>
+
+            <a class="nav-link {% if 'database' in request.resolver_match.url_name %}active{% endif %}"
+               href="{% url 'config:database-list' %}">
+                <i class="fas fa-database me-2"></i>
+                Banco de Dados
+            </a>
+
+            <a class="nav-link {% if 'email' in request.resolver_match.url_name %}active{% endif %}"
+               href="#">
+                <i class="fas fa-envelope me-2"></i>
+                Email
+            </a>
+
+            <a class="nav-link {% if 'ldap' in request.resolver_match.url_name %}active{% endif %}"
+               href="{% url 'config:ldap-list' %}">
+                <i class="fas fa-server me-2"></i>
+                LDAP
+            </a>
+
+            <a class="nav-link" href="#" onclick="alert('Funcionalidade Redes Sociais em desenvolvimento')">
+                <i class="fab fa-google me-2"></i>
+                Redes Sociais
+            </a>
+
+            <a class="nav-link {% if 'env-variable' in request.resolver_match.url_name %}active{% endif %}"
+               href="{% url 'config:env-variables' %}">
+                <i class="fas fa-code me-2"></i>
+                Variáveis de Ambiente
+            </a>
+        </div>
+
+        <!-- Gerenciamento de Módulos -->
+        <div class="nav-section mt-3">
+            <h6 class="nav-header text-white-50 text-uppercase small fw-bold mb-2">
+                <i class="fas fa-puzzle-piece me-1"></i>Módulos
+            </h6>
+
+            <a class="nav-link {% if 'app-list' in request.resolver_match.url_name %}active{% endif %}"
+               href="{% url 'config:app-list' %}">
+                <i class="fas fa-list me-2"></i>
+                Lista de Módulos
+            </a>
+
+            <a class="nav-link" href="#" onclick="alert('Use a Lista de Módulos para ativar/desativar')">
+                <i class="fas fa-toggle-on me-2"></i>
+                Ativar/Desativar
+            </a>
+
+            <a class="nav-link" href="#" data-bs-toggle="modal" data-bs-target="#installAppModal">
+                <i class="fas fa-download me-2"></i>
+                Instalar Módulo
+            </a>
+        </div>
+
+        <!-- Segurança -->
+        <div class="nav-section mt-3">
+            <h6 class="nav-header text-white-50 text-uppercase small fw-bold mb-2">
+                <i class="fas fa-shield-alt me-1"></i>Segurança
+            </h6>
+
+            <a class="nav-link" href="#">
+                <i class="fas fa-key me-2"></i>
+                Permissões
+            </a>
+
+            <a class="nav-link" href="#">
+                <i class="fas fa-history me-2"></i>
+                Logs do Sistema
+            </a>
+
+            <a class="nav-link" href="#">
+                <i class="fas fa-shield-virus me-2"></i>
+                Backup/Restore
+            </a>
+        </div>
+
+        <!-- Ferramentas Avançadas -->
+        <div class="nav-section mt-3">
+            <h6 class="nav-header text-white-50 text-uppercase small fw-bold mb-2">
+                <i class="fas fa-tools me-1"></i>Ferramentas
+            </h6>
+
+            <a class="nav-link" href="/admin/" target="_blank">
+                <i class="fas fa-database me-2"></i>
+                Admin Django
+            </a>
+
+            <a class="nav-link" href="#" data-bs-toggle="modal" data-bs-target="#clearCacheModal">
+                <i class="fas fa-broom me-2"></i>
+                Limpar Cache
+            </a>
+
+            <a class="nav-link" href="#" data-bs-toggle="modal" data-bs-target="#systemInfoModal">
+                <i class="fas fa-info-circle me-2"></i>
+                Info do Sistema
+            </a>
+        </div>
+
+        <!-- Status do Sistema -->
+        <div class="nav-section mt-3">
+            <h6 class="nav-header text-white-50 text-uppercase small fw-bold mb-2">
+                <i class="fas fa-heartbeat me-1"></i>Status
+            </h6>
+
+            <div class="nav-link-static">
+                <div class="d-flex justify-content-between align-items-center mb-2">
+                    <span class="text-white-50 small">Sistema:</span>
+                    <span class="badge bg-success">Online</span>
+                </div>
+                <div class="d-flex justify-content-between align-items-center mb-2">
+                    <span class="text-white-50 small">Database:</span>
+                    <span class="badge bg-success">Conectado</span>
+                </div>
+                <div class="d-flex justify-content-between align-items-center mb-2">
+                    <span class="text-white-50 small">Cache:</span>
+                    <span class="badge bg-warning">Limitado</span>
+                </div>
+                <div class="d-flex justify-content-between align-items-center">
+                    <span class="text-white-50 small">Módulos:</span>
+                    <span class="badge bg-info">4 Ativos</span>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Footer Info -->
+    <div class="mt-auto pt-3">
+        <hr class="text-white-50">
+        <div class="text-center">
+            <small class="text-white-50">
+                <i class="fas fa-cogs me-1"></i>
+                Painel de Configurações
+            </small>
+            <br>
+            <small class="text-white-50">
+                Django {{ django_version }}
+            </small>
+        </div>
+    </div>
+</div>
+
+<!-- Modais -->
+<!-- Modal Instalar App -->
+<div class="modal fade" id="installAppModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">
+                    <i class="fas fa-download me-2"></i>Instalar Novo Módulo
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <p>Funcionalidade em desenvolvimento...</p>
+                <p class="text-muted">Em breve você poderá instalar novos módulos diretamente pela interface.</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fechar</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal Limpar Cache -->
+<div class="modal fade" id="clearCacheModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">
+                    <i class="fas fa-broom me-2"></i>Limpar Cache
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <p>Tem certeza que deseja limpar todo o cache do sistema?</p>
+                <p class="text-warning">
+                    <i class="fas fa-exclamation-triangle me-1"></i>
+                    Esta ação pode afetar temporariamente a performance do sistema.
+                </p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                <button type="button" class="btn btn-warning">
+                    <i class="fas fa-broom me-1"></i>Limpar Cache
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal Info do Sistema -->
+<div class="modal fade" id="systemInfoModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">
+                    <i class="fas fa-info-circle me-2"></i>Informações do Sistema
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <div class="row">
+                    <div class="col-md-6">
+                        <h6>Sistema</h6>
+                        <ul class="list-unstyled">
+                            <li><strong>Django:</strong> {{ django_version }}</li>
+                            <li><strong>Python:</strong> {{ python_version }}</li>
+                            <li><strong>Projeto Havoc:</strong> 1.0.0</li>
+                        </ul>
+                    </div>
+                    <div class="col-md-6">
+                        <h6>Banco de Dados</h6>
+                        <ul class="list-unstyled">
+                            <li><strong>Engine:</strong> SQLite</li>
+                            <li><strong>Versão:</strong> 3.x</li>
+                            <li><strong>Status:</strong> <span class="badge bg-success">Conectado</span></li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fechar</button>
+            </div>
+        </div>
+    </div>
+</div>
