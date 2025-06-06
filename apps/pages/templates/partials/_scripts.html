@@ -222,12 +222,9 @@ function showLogoutConfirmModal() {
                         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
                             <i class="fas fa-times me-1"></i>Cancelar
                         </button>
-                        <form method="post" action="/accounts/logout/" class="d-inline">
-                            <input type="hidden" name="csrfmiddlewaretoken" value="${csrftoken}">
-                            <button type="submit" class="btn btn-danger">
-                                <i class="fas fa-sign-out-alt me-1"></i>Sim, Fazer Logout
-                            </button>
-                        </form>
+                        <a href="/accounts/logout/" class="btn btn-danger">
+                            <i class="fas fa-sign-out-alt me-1"></i>Sim, Fazer Logout
+                        </a>
                     </div>
                 </div>
             </div>

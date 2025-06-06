@@ -14,7 +14,7 @@ class CustomUserCreationForm(UserCreationForm):
 
     email = forms.EmailField(
         widget=forms.EmailInput(attrs={'placeholder': 'Email', 'autocomplete': 'email'}),
-        help_text='Digite um email válido. Este será usado para recuperação de senha.'
+        help_text='Digite um email válido e real. Este será usado para recuperação de senha.'
     )
 
     password1 = forms.CharField(
@@ -41,8 +41,18 @@ class CustomUserCreationForm(UserCreationForm):
 
     def clean_email(self):
         email = self.cleaned_data.get('email')
+
+        # Verificar se email já está sendo usado
         if CustomUser.objects.filter(email=email).exists():
             raise ValidationError('Este email já está sendo usado.')
+
+        # Validação avançada de email (nível básico - rápido)
+        from .validators import validate_real_email_basic
+        try:
+            validate_real_email_basic(email)
+        except ValidationError as e:
+            raise ValidationError(str(e.message))
+
         return email
 
 

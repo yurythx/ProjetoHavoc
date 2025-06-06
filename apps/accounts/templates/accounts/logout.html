@@ -15,12 +15,9 @@
             <div class="logout-actions">
 
 
-                <form method="post" action="{% url 'accounts:logout' %}">
-                    {% csrf_token %}
-                    <button type="submit" class="btn btn-danger">
-                        <i class="fas fa-sign-out-alt"></i> Sim, quero sair
-                    </button>
-                </form>
+                <a href="{% url 'accounts:logout' %}" class="btn btn-danger">
+                    <i class="fas fa-sign-out-alt"></i> Sim, quero sair
+                </a>
                 <a href="{% url 'accounts:profile' %}" class="btn btn-secondary">
                     <i class="fas fa-times"></i> Cancelar
                 </a>

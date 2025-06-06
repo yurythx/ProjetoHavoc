@@ -82,6 +82,7 @@ INSTALLED_APPS = [
     'crispy_bootstrap5',  # se usar Bootstrap 5
     'widget_tweaks',      # para personalização de widgets de formulário
     'compressor',         # para compressão de CSS/JS
+    'django_celery_results',  # Para armazenar resultados das tarefas Celery
 
     # AllAuth
     'allauth',
@@ -560,6 +561,56 @@ COMPRESS_CSS_FILTERS = [
     'compressor.filters.css_default.CssAbsoluteFilter',
     'compressor.filters.cssmin.rCSSMinFilter',
 ]
+
+COMPRESS_JS_FILTERS = [
+    'compressor.filters.jsmin.rJSMinFilter',
+]
+
+# =============================================================================
+# CONFIGURAÇÕES DO CELERY (TAREFAS ASSÍNCRONAS)
+# =============================================================================
+
+# Broker (onde as tarefas ficam em fila)
+# Redis é mais rápido e simples para desenvolvimento
+CELERY_BROKER_URL = config('CELERY_BROKER_URL', default='redis://localhost:6379/0')
+
+# Backend para armazenar resultados das tarefas
+CELERY_RESULT_BACKEND = 'django-db'  # Usar banco Django
+CELERY_CACHE_BACKEND = 'django-cache'  # Cache Django
+
+# Configurações de serialização
+CELERY_TASK_SERIALIZER = 'json'
+CELERY_ACCEPT_CONTENT = ['json']
+CELERY_RESULT_SERIALIZER = 'json'
+
+# Configurações de timezone
+CELERY_TIMEZONE = TIME_ZONE
+CELERY_ENABLE_UTC = True
+
+# Configurações de retry e timeout
+CELERY_TASK_ACKS_LATE = True  # Confirma tarefa apenas após conclusão
+CELERY_WORKER_PREFETCH_MULTIPLIER = 1  # Worker pega uma tarefa por vez
+CELERY_TASK_SOFT_TIME_LIMIT = 300  # 5 minutos limite suave
+CELERY_TASK_TIME_LIMIT = 600  # 10 minutos limite rígido
+
+# Configurações de resultado
+CELERY_RESULT_EXPIRES = 3600  # Resultados expiram em 1 hora
+
+# Configurações específicas para email
+CELERY_TASK_ROUTES = {
+    'apps.accounts.tasks.send_activation_email_async': {'queue': 'email'},
+    'apps.accounts.tasks.send_password_reset_email_async': {'queue': 'email'},
+}
+
+# Configurações de log do Celery
+CELERY_WORKER_LOG_LEVEL = 'INFO'
+CELERY_WORKER_HIJACK_ROOT_LOGGER = False
+
+# Em desenvolvimento, usar configurações mais verbosas
+if DEBUG:
+    CELERY_TASK_ALWAYS_EAGER = config('CELERY_TASK_ALWAYS_EAGER', default=True, cast=bool)  # True para desenvolvimento sem Redis
+    CELERY_TASK_EAGER_PROPAGATES = True
+    CELERY_WORKER_LOG_LEVEL = 'DEBUG'
 
 COMPRESS_JS_FILTERS = [
     'compressor.filters.jsmin.rJSMinFilter',

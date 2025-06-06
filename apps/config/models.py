@@ -158,7 +158,7 @@ class SocialProviderConfig(models.Model):
 
 class EmailConfig(models.Model):
     email_host = models.CharField(max_length=255)
-    slug = models.SlugField(max_length=60, unique=True, blank=True, default='email-config')
+    slug = models.SlugField(max_length=60, unique=True, blank=True)
     email_port = models.IntegerField()
     email_host_user = models.CharField(max_length=255)
     email_host_password = models.CharField(max_length=500)  # Aumentado para acomodar texto criptografado

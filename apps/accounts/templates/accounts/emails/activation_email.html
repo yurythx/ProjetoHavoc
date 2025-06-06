@@ -1,29 +1,193 @@
-{% extends "accounts/emails/base_email.html" %}
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Código de Ativação da Conta</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f4f4f4;
+        }
+        .container {
+            background-color: #ffffff;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 0 20px rgba(0,0,0,0.1);
+        }
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+            padding-bottom: 20px;
+            border-bottom: 2px solid #007bff;
+        }
+        .logo {
+            font-size: 28px;
+            font-weight: bold;
+            color: #007bff;
+            margin-bottom: 10px;
+        }
+        .subtitle {
+            color: #666;
+            font-size: 16px;
+        }
+        .content {
+            margin-bottom: 30px;
+        }
+        .greeting {
+            font-size: 18px;
+            margin-bottom: 20px;
+            color: #333;
+        }
+        .code-section {
+            background-color: #f8f9fa;
+            border: 2px dashed #007bff;
+            border-radius: 8px;
+            padding: 20px;
+            text-align: center;
+            margin: 25px 0;
+        }
+        .code {
+            font-size: 32px;
+            font-weight: bold;
+            color: #007bff;
+            letter-spacing: 8px;
+            font-family: 'Courier New', monospace;
+            margin: 10px 0;
+        }
+        .code-label {
+            font-size: 14px;
+            color: #666;
+            margin-bottom: 10px;
+        }
+        .instructions {
+            background-color: #e7f3ff;
+            border-left: 4px solid #007bff;
+            padding: 15px;
+            margin: 20px 0;
+        }
+        .instructions h3 {
+            margin-top: 0;
+            color: #007bff;
+        }
+        .button {
+            display: inline-block;
+            background-color: #007bff;
+            color: white;
+            padding: 12px 30px;
+            text-decoration: none;
+            border-radius: 5px;
+            font-weight: bold;
+            margin: 20px 0;
+        }
+        .footer {
+            margin-top: 30px;
+            padding-top: 20px;
+            border-top: 1px solid #eee;
+            font-size: 12px;
+            color: #666;
+            text-align: center;
+        }
+        .warning {
+            background-color: #fff3cd;
+            border: 1px solid #ffeaa7;
+            border-radius: 5px;
+            padding: 15px;
+            margin: 20px 0;
+            color: #856404;
+        }
+        .security-note {
+            background-color: #f8d7da;
+            border: 1px solid #f5c6cb;
+            border-radius: 5px;
+            padding: 15px;
+            margin: 20px 0;
+            color: #721c24;
+        }
+        .celery-badge {
+            background: linear-gradient(45deg, #28a745, #20c997);
+            color: white;
+            padding: 5px 10px;
+            border-radius: 15px;
+            font-size: 10px;
+            font-weight: bold;
+            display: inline-block;
+            margin: 5px 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="logo">🚀 ProjetoHavoc</div>
+            <div class="subtitle">Sistema de Gestão Empresarial</div>
+            <div class="celery-badge">⚡ Powered by Celery Async</div>
+        </div>
 
-{% block email_title %}Ativação de Conta - Projeto Havoc{% endblock %}
-{% block email_header_title %}Ativação de Conta{% endblock %}
-{% block email_header_subtitle %}Confirme seu cadastro no Projeto Havoc{% endblock %}
+        <div class="content">
+            <div class="greeting">
+                Olá, <strong>{{ user.first_name|default:user.username }}</strong>! 👋
+            </div>
 
-{% block email_content %}
-    <h2>Olá {{ user.get_username }},</h2>
-    <p>Obrigado por se registrar no <strong>Projeto Havoc</strong>!</p>
-    <p>Para ativar sua conta e começar a usar nosso sistema, clique no botão abaixo:</p>
+            <p>Bem-vindo ao <strong>ProjetoHavoc</strong>! Estamos muito felizes em tê-lo conosco.</p>
 
-    <div class="btn-center">
-        <a href="{{ activation_link }}" class="btn" rel="noopener" target="_blank">
-            Ativar Conta
-        </a>
-    </div>
+            <p>Para ativar sua conta e começar a usar nosso sistema, utilize o código de ativação abaixo:</p>
 
-    <div class="info-box">
-        <h3>Link de Ativação</h3>
-        <p>Se preferir, copie e cole o link abaixo no seu navegador:</p>
-        <div class="link-box">
-            <a href="{{ activation_link }}" rel="noopener" target="_blank">{{ activation_link }}</a>
+            <div class="code-section">
+                <div class="code-label">SEU CÓDIGO DE ATIVAÇÃO</div>
+                <div class="code">{{ activation_code }}</div>
+                <div style="font-size: 12px; color: #666; margin-top: 10px;">
+                    ⏰ Este código expira em 24 horas
+                </div>
+            </div>
+
+            <div class="instructions">
+                <h3>📋 Como ativar sua conta:</h3>
+                <ol>
+                    <li>Acesse a página de ativação do sistema</li>
+                    <li>Digite seu email: <strong>{{ user.email }}</strong></li>
+                    <li>Insira o código de ativação: <strong>{{ activation_code }}</strong></li>
+                    <li>Clique em "Ativar Conta"</li>
+                </ol>
+            </div>
+
+            <div style="text-align: center;">
+                <a href="{{ site_domain }}/accounts/ativar/?email={{ user.email }}" class="button">
+                    🔓 Ativar Minha Conta
+                </a>
+            </div>
+
+            <div class="warning">
+                <strong>⚠️ Importante:</strong>
+                <ul style="margin: 10px 0; padding-left: 20px;">
+                    <li>Este código é válido por <strong>24 horas</strong></li>
+                    <li>Você tem até <strong>5 tentativas</strong> para inserir o código correto</li>
+                    <li>Após esse período, será necessário solicitar um novo código</li>
+                </ul>
+            </div>
+
+            <div class="security-note">
+                <strong>🔒 Nota de Segurança:</strong><br>
+                Se você não criou esta conta, ignore este email. Nenhuma ação adicional é necessária.
+                O código expirará automaticamente em 24 horas.
+            </div>
+        </div>
+
+        <div class="footer">
+            <p><strong>ProjetoHavoc - Sistema de Gestão Empresarial</strong></p>
+            <p>Este é um email automático, não responda a esta mensagem.</p>
+            <p>Se você tiver dúvidas, entre em contato com nosso suporte.</p>
+            <hr style="margin: 15px 0; border: none; border-top: 1px solid #eee;">
+            <p style="font-size: 10px; color: #999;">
+                ⚡ Email enviado via sistema assíncrono Celery<br>
+                🚀 Processamento rápido e confiável - Sem bloqueios na interface
+            </p>
         </div>
     </div>
-
-    <div class="warning-box">
-        <p><strong>Importante:</strong> Se você não criou essa conta, ignore este email.</p>
-    </div>
-{% endblock %}
+</body>
+</html>

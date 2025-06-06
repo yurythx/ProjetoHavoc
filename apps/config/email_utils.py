@@ -14,16 +14,6 @@ def get_active_email_config():
     Retorna a configuração de email ativa (prioriza a padrão)
     """
     try:
-        from django.db import connection
-
-        # Verificar se as tabelas existem
-        if not connection.ensure_connection():
-            return None
-
-        table_names = connection.introspection.table_names()
-        if 'config_emailconfig' not in table_names:
-            return None
-
         # Primeiro, tentar obter a configuração padrão
         default_config = EmailConfig.objects.filter(is_default=True, is_active=True).first()
         if default_config:
@@ -31,7 +21,8 @@ def get_active_email_config():
 
         # Se não houver padrão, pegar qualquer configuração ativa
         return EmailConfig.objects.filter(is_active=True).first()
-    except Exception:
+    except Exception as e:
+        logger.error(f"Erro ao buscar configuração ativa: {e}")
         return None
 
 def get_email_connection(config=None):

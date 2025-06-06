@@ -14,6 +14,17 @@
                     </h4>
                 </div>
                 <div class="card-body p-4">
+                    <!-- Indicador de Sucesso do Registro -->
+                    <div id="registration-success" class="alert alert-success d-none mb-4">
+                        <div class="d-flex align-items-center">
+                            <i class="fas fa-check-circle text-success me-3 fa-lg"></i>
+                            <div class="flex-grow-1">
+                                <strong>Conta criada com sucesso!</strong><br>
+                                <small id="success-message">Código de ativação sendo enviado para seu email.</small>
+                            </div>
+                        </div>
+                    </div>
+
                     <div class="text-center mb-4">
                         <div class="alert alert-info">
                             <i class="fas fa-envelope me-2"></i>
@@ -220,6 +231,28 @@
 {% block extra_js %}
 <script>
 document.addEventListener('DOMContentLoaded', function() {
+    // Verificar se há parâmetros de sucesso na URL
+    const urlParams = new URLSearchParams(window.location.search);
+    if (urlParams.get('success') === 'true') {
+        const registrationSuccess = document.getElementById('registration-success');
+        if (registrationSuccess) {
+            registrationSuccess.classList.remove('d-none');
+
+            const message = urlParams.get('message');
+            if (message) {
+                const successMessage = document.getElementById('success-message');
+                if (successMessage) {
+                    successMessage.textContent = decodeURIComponent(message);
+                }
+            }
+
+            // Limpar URL após 3 segundos
+            setTimeout(() => {
+                window.history.replaceState({}, document.title, window.location.pathname + window.location.search.replace(/[?&]success=true[^&]*/, '').replace(/[?&]message=[^&]*/, ''));
+            }, 3000);
+        }
+    }
+
     // Auto-focus no campo de email se estiver vazio
     const emailField = document.getElementById('id_email');
     const codigoField = document.getElementById('id_codigo');
