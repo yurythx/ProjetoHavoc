@@ -1,225 +1,265 @@
-# 🚀 Projeto Havoc - Sistema de Gerenciamento Modular
+# Ecossistema de Automação com Docker
 
-Sistema de gerenciamento modular e inteligente desenvolvido em Django, com interface moderna e funcionalidades avançadas.
+Este projeto implementa um ecossistema completo de automação utilizando Docker Compose, composto por quatro soluções principais que trabalham em conjunto:
 
-## ✨ Características
+1. **Chatwoot** - Plataforma de atendimento ao cliente
+2. **Evolution API** - Integração com WhatsApp
+3. **n8n** - Automação de fluxos de trabalho
+4. **MinIO** - Armazenamento de objetos
 
-- 🎨 **Interface Moderna**: Design responsivo com Bootstrap 5
-- 👥 **Gestão de Usuários**: Sistema completo de autenticação e autorização
-- 🔐 **Autenticação Social**: Login com Google, GitHub e LDAP
-- ⚙️ **Sistema Modular**: Configuração flexível de módulos e plugins
-- 📊 **Dashboard Intuitivo**: Painel de controle com estatísticas
-- 🛡️ **Segurança Avançada**: Proteção contra ataques comuns
-- 🌐 **Multilíngue**: Suporte a português brasileiro
+## 🔍 Visão Geral da Arquitetura
 
-## 🛠️ Tecnologias
-
-- **Backend**: Django 5.2.1
-- **Frontend**: Bootstrap 5, Font Awesome, JavaScript
-- **Banco de Dados**: SQLite (padrão), PostgreSQL, MySQL
-- **Autenticação**: Django Allauth
-- **Formulários**: Django Crispy Forms
-- **Segurança**: CSRF, HSTS, XSS Protection
-
-## 📋 Pré-requisitos
-
-- Python 3.8+
-- pip (gerenciador de pacotes Python)
-- Git
-
-## 🚀 Instalação
-
-### 1. Clone o repositório
-```bash
-git clone https://github.com/seu-usuario/projeto-havoc.git
-cd projeto-havoc
+```mermaid
+graph TD
+    A[Chatwoot] <-->|Integração| B[Evolution API]
+    A <-->|Automação| C[n8n]
+    B <-->|Automação| C
+    A <-->|Armazenamento| D[MinIO]
+    B <-->|Armazenamento| D
+    C <-->|Armazenamento| D
+    
+    subgraph "Docker Network: ravenna_net"
+        A
+        B
+        C
+        D
+    end
 ```
 
-### 2. Crie um ambiente virtual
-```bash
-python -m venv env
-```
+## 🚀 Soluções Implementadas
 
-### 3. Ative o ambiente virtual
-```bash
-# Windows
-env\Scripts\activate
+### 1. Chatwoot
+**Propósito**: Plataforma de atendimento ao cliente multicanal com suporte a chat, e-mail e redes sociais.
 
-# Linux/Mac
-source env/bin/activate
-```
+**Componentes**:
+- **Aplicação Rails**: Interface web principal
+- **PostgreSQL com pgvector**: Armazenamento de dados e buscas vetoriais
+- **Redis**: Cache e gerenciamento de filas
+- **Nginx**: Servidor web reverso
 
-### 4. Instale as dependências
-```bash
-pip install -r requirements.txt
-```
+### 2. Evolution API
+**Propósito**: API robusta para integração com WhatsApp, permitindo envio e recebimento de mensagens.
 
-### 5. Configure as variáveis de ambiente
-```bash
-# Copie o arquivo de exemplo
-cp .env.example .env
+**Recursos Principais**:
+- Autenticação via chave de API
+- Suporte a múltiplas instâncias
+- Webhooks para eventos em tempo real
+- Armazenamento de mídia
 
-# Edite o arquivo .env com suas configurações
-```
+### 3. n8n
+**Propósito**: Plataforma de automação de fluxo de trabalho com interface visual.
 
-### 6. Execute as migrações
-```bash
-python manage.py migrate
-```
+**Funcionalidades**:
+- Integração com diversos serviços
+- Automação de tarefas
+- Agendamento de rotinas
+- Manipulação de dados
 
-### 7. Crie um superusuário
-```bash
-python manage.py createsuperuser
-```
+### 4. MinIO
+**Propósito**: Armazenamento de objetos compatível com Amazon S3 para armazenar mídias e arquivos do ecossistema.
 
-### 8. Colete os arquivos estáticos
-```bash
-python manage.py collectstatic
-```
+**Recursos Principais**:
+- Interface web intuitiva (Console MinIO)
+- Compatível com a API S3
+- Armazenamento altamente escalável
+- Suporte a políticas de acesso granulares
 
-### 9. Execute o servidor
-```bash
-python manage.py runserver
-```
+**Portas**:
+- API: 9000
+- Console Web: 9001
 
-Acesse: http://localhost:8000
+## 🛠️ Guia de Instalação
 
-## ⚙️ Configuração
+### Pré-requisitos
+- Docker 20.10+
+- Docker Compose 2.0+
+- 4GB de RAM (mínimo)
+- 2 vCPUs (mínimo)
+- Pelo menos 10GB de espaço em disco para armazenamento
 
-### Variáveis de Ambiente
+### Passo 1: Configuração Inicial
 
-Edite o arquivo `.env` com suas configurações:
+1. Clone o repositório:
+   ```bash
+   git clone [URL_DO_REPOSITÓRIO]
+   cd ProjetoHavoc
+   ```
 
+2. Crie a rede Docker compartilhada:
+   ```bash
+   docker network create ravenna_net
+   ```
+
+### Passo 2: Configuração dos Serviços
+
+#### MinIO (Recomendado instalar primeiro)
+1. Navegue até a pasta do MinIO:
+   ```bash
+   cd minio
+   ```
+
+2. Crie o arquivo `.minio.env` com as credenciais:
+   ```env
+   MINIO_ROOT_USER=admin
+   MINIO_ROOT_PASSWORD=senha_muito_forte
+   MINIO_SERVER_URL=http://localhost:9000
+   MINIO_CONSOLE_ADDRESS=":9001"
+   ```
+
+3. Inicie o MinIO:
+   ```bash
+   docker-compose up -d
+   ```
+
+4. Acesse o console web em `http://localhost:9001` e faça login com as credenciais fornecidas.
+
+5. Cione um bucket chamado `media` para armazenar os arquivos do sistema.
+
+#### Chatwoot
+1. Navegue até a pasta do Chatwoot:
+   ```bash
+   cd chathoot
+   ```
+
+2. Crie o arquivo `.env` com as variáveis necessárias:
+   ```env
+   POSTGRES_PASSWORD=senha_forte_aqui
+   REDIS_PASSWORD=outra_senha_forte
+   # Outras variáveis necessárias
+   ```
+
+3. Inicie os containers:
+   ```bash
+   docker-compose up -d
+   ```
+
+#### Evolution API
+1. Navegue até a pasta do Evolution:
+   ```bash
+   cd ../evolution
+   ```
+
+2. Crie o arquivo `.env` com suas configurações:
+   ```env
+   POSTGRES_PASSWORD=senha_postgres
+   REDIS_PASSWORD=senha_redis
+   AUTHENTICATION_API_KEY=sua_chave_secreta
+   ```
+
+3. Inicie os serviços:
+   ```bash
+   docker-compose up -d
+   ```
+
+#### n8n
+1. Navegue até a pasta do n8n:
+   ```bash
+   cd ../n8n
+   ```
+
+2. Crie o arquivo `.env`:
+   ```env
+   N8N_BASIC_AUTH_USER=admin
+   N8N_BASIC_AUTH_PASSWORD=senha_segura
+   DB_POSTGRESDB_PASSWORD=senha_banco
+   ```
+
+3. Inicie a plataforma:
+   ```bash
+   docker-compose up -d
+   ```
+
+## 🔄 Fluxo de Dados
+
+1. **Armazenamento de Mídia**:
+   - Arquivos de mídia são armazenados no MinIO
+   - Links de acesso são referenciados nos outros serviços
+
+2. **Recepção de Mensagens**:
+   - WhatsApp → Evolution API → Chatwoot
+   - Mídias são salvas no MinIO
+
+3. **Processamento**:
+   - Chatwoot processa a mensagem
+   - Regras de automação são acionadas via n8n
+   - N8n pode acessar e processar arquivos do MinIO
+
+4. **Resposta**:
+   - Chatwoot → Evolution API → WhatsApp
+   - Mídias são recuperadas do MinIO quando necessário
+
+## 🔒 Segurança
+
+- Todas as comunicações entre serviços são feitas através da rede privada Docker
+- Autenticação básica habilitada no n8n e MinIO
+- Senhas e chaves devem ser armazenadas em variáveis de ambiente
+- Recomenda-se o uso de HTTPS em produção
+- Configure políticas de acesso adequadas no MinIO
+- Mantenha as credenciais do MinIO em um local seguro
+
+## � Integração com MinIO
+
+### Configuração no Chatwoot
+Adicione as seguintes variáveis no arquivo `.env` do Chatwoot:
 ```env
-# Configurações básicas
-SECRET_KEY=sua-chave-secreta-aqui
-DEBUG=True
-ALLOWED_HOSTS=localhost,127.0.0.1
-
-# Banco de dados
-DATABASE_URL=sqlite:///db.sqlite3
-
-# Email
-EMAIL_HOST=smtp.gmail.com
-EMAIL_PORT=587
-EMAIL_HOST_USER=seu-email@gmail.com
-EMAIL_HOST_PASSWORD=sua-senha-de-app
-EMAIL_USE_TLS=True
+ACTIVE_STORAGE_SERVICE=s3
+S3_BUCKET_NAME=media
+S3_ACCESS_KEY_ID=seu_access_key
+S3_SECRET_ACCESS_KEY=sua_secret_key
+S3_REGION=us-east-1
+S3_ENDPOINT=http://minio:9000
+S3_FORCE_PATH_STYLE=true
 ```
 
-### Autenticação Social (Opcional)
-
-Para habilitar login social, configure:
-
-1. **Google OAuth**:
-   - Acesse [Google Cloud Console](https://console.cloud.google.com/)
-   - Crie um projeto e configure OAuth 2.0
-   - Adicione as credenciais no arquivo `.env`
-
-2. **GitHub OAuth**:
-   - Acesse [GitHub Developer Settings](https://github.com/settings/developers)
-   - Crie uma nova OAuth App
-   - Adicione as credenciais no arquivo `.env`
-
-### LDAP (Opcional)
-
-Para autenticação LDAP corporativa, configure:
-
+### Configuração na Evolution API
+Adicione no `.env` da Evolution API:
 ```env
-LDAP_SERVER=ldap.seudominio.com
-LDAP_PORT=389
-LDAP_BIND_DN=cn=admin,dc=seudominio,dc=com
-LDAP_BIND_PASSWORD=sua-senha-ldap
+STORAGE_TYPE=minio
+STORAGE_ENDPOINT=http://minio:9000
+STORAGE_ACCESS_KEY=seu_access_key
+STORAGE_SECRET_KEY=sua_secret_key
+STORAGE_BUCKET=media
+STORAGE_REGION=us-east-1
+STORAGE_FORCE_PATH_STYLE=true
 ```
 
-## 📁 Estrutura do Projeto
+### Configuração no n8n
+1. Instale o nó "n8n-nodes-s3" nas configurações do n8n
+2. Use as credenciais do MinIO para configurar a conexão S3
+
+## �📦 Estrutura de Diretórios
 
 ```
-projeto-havoc/
-├── apps/                   # Aplicações Django
-│   ├── accounts/          # Gestão de usuários
-│   ├── articles/          # Sistema de artigos
-│   ├── config/            # Configurações do sistema
-│   └── pages/             # Páginas estáticas
-├── core/                  # Configurações principais
-├── static/                # Arquivos estáticos
-├── templates/             # Templates base
-├── media/                 # Uploads de usuários
-├── requirements.txt       # Dependências Python
-├── manage.py             # Script de gerenciamento Django
-└── .env.example          # Exemplo de configuração
+ProjetoHavoc/
+├── chathoot/           # Configuração do Chatwoot
+│   ├── docker-compose.yml
+│   └── .env
+├── evolution/          # Configuração da Evolution API
+│   ├── docker-compose.yml
+│   └── .env
+├── minio/             # Configuração do MinIO
+│   ├── docker-compose.yml
+│   └── .minio.env
+├── n8n/               # Configuração do n8n
+│   ├── docker-compose.yml
+│   └── .env
+└── README.md          # Este arquivo
 ```
 
-## 🔧 Comandos Úteis
+## 🚨 Solução de Problemas
 
+### Verificar logs dos containers
 ```bash
-# Executar testes
-python manage.py test
-
-# Criar migrações
-python manage.py makemigrations
-
-# Aplicar migrações
-python manage.py migrate
-
-# Criar superusuário
-python manage.py createsuperuser
-
-# Coletar arquivos estáticos
-python manage.py collectstatic
-
-# Verificar configuração
-python manage.py check
-
-# Verificar configuração para produção
-python manage.py check --deploy
+docker-compose logs -f [nome_do_serviço]
 ```
 
-## 🛡️ Segurança
+### Verificar saúde dos serviços
+```bash
+docker ps --format "table {{.Names}}\t{{.Status}}"
+```
 
-O sistema inclui várias medidas de segurança:
-
-- Proteção CSRF
-- Validação de entrada
-- Sanitização de dados
-- Headers de segurança
-- Criptografia de senhas
-- Controle de sessão
-
-Para produção, certifique-se de:
-
-1. Definir `DEBUG=False`
-2. Configurar `SECRET_KEY` única
-3. Configurar `ALLOWED_HOSTS`
-4. Habilitar HTTPS
-5. Configurar headers de segurança
-
-## 📚 Documentação
-
-- [Django Documentation](https://docs.djangoproject.com/)
-- [Bootstrap Documentation](https://getbootstrap.com/docs/)
-- [Django Allauth](https://django-allauth.readthedocs.io/)
+## 📝 Licença
+Este projeto está sob a licença [MIT](LICENSE).
 
 ## 🤝 Contribuição
-
-1. Faça um fork do projeto
-2. Crie uma branch para sua feature (`git checkout -b feature/AmazingFeature`)
-3. Commit suas mudanças (`git commit -m 'Add some AmazingFeature'`)
-4. Push para a branch (`git push origin feature/AmazingFeature`)
-5. Abra um Pull Request
-
-## 📄 Licença
-
-Este projeto está sob a licença MIT. Veja o arquivo `LICENSE` para mais detalhes.
-
-## 📞 Suporte
-
-Para suporte e dúvidas:
-
-- 📧 Email: suporte@projetohavoc.com
-- 🐛 Issues: [GitHub Issues](https://github.com/seu-usuario/projeto-havoc/issues)
-- 📖 Wiki: [GitHub Wiki](https://github.com/seu-usuario/projeto-havoc/wiki)
-
----
-
-Desenvolvido com ❤️ pela equipe Projeto Havoc
+Contribuições são bem-vindas! Sinta-se à vontade para abrir issues e enviar pull requests.

@@ -1,0 +1,104 @@
+version: '3.8'
+
+services:
+  postgres_ravenna:
+    image: postgres:15
+    container_name: postgres_ravenna
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DB}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - ravenna_net
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  redis_ravenna:
+    image: redis:7
+    container_name: redis_ravenna
+    command: redis-server --appendonly yes --requirepass ${REDIS_PASSWORD}
+    #ports:
+    #  - "6379:6379"
+    volumes:
+      - redis_data:/data
+    networks:
+      - ravenna_net
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", "redis-cli ping || exit 1"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  evolution_api:
+    image: evoapicloud/evolution-api:v2.3.1
+    container_name: evolution_api
+    depends_on:
+      postgres_ravenna:
+        condition: service_healthy
+      redis_ravenna:
+        condition: service_healthy
+    env_file: .env
+    environment:
+      LANGUAGE: pt-BR
+      AUTHENTICATION_API_KEY: ${AUTHENTICATION_API_KEY}
+      AUTHENTICATION_EXPOSE_IN_FETCH_INSTANCES: "true"
+      DEL_INSTANCE: "false"
+      LOG_LEVEL: ERROR,WARN,DEBUG,INFO,LOG,VERBOSE,DARK,WEBHOOKS
+      CONFIG_SESSION_PHONE_CLIENT: Projeto Havoc
+      CONFIG_SESSION_PHONE_NAME: Chrome
+      QRCODE_LIMIT: 5
+      DATABASE_PROVIDER: postgresql
+      DATABASE_CONNECTION_URI: postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres_ravenna:5432/${POSTGRES_DB}?schema=public
+      DATABASE_CONNECTION_CLIENT_NAME: postgres
+      DATABASE_SAVE_DATA_INSTANCE: "true"
+      DATABASE_SAVE_DATA_NEW_MESSAGE: "true"
+      DATABASE_SAVE_MESSAGE_UPDATE: "true"
+      DATABASE_SAVE_DATA_CONTACTS: "true"
+      DATABASE_SAVE_DATA_CHATS: "true"
+      DATABASE_SAVE_DATA_LABELS: "true"
+      DATABASE_SAVE_DATA_HISTORIC: "true"
+      CACHE_REDIS_ENABLED: "true"
+      CACHE_REDIS_URI: redis://default:${REDIS_PASSWORD}@redis_ravenna:6379/6
+      CACHE_REDIS_PREFIX_KEY: evolution
+      CACHE_REDIS_TTL: 604800
+      CACHE_REDIS_SAVE_INSTANCES: "true"
+      OPENAI_ENABLED: "true"
+      DIFY_ENABLED: "true"
+      TYPEBOT_ENABLED: "true"
+      TYPEBOT_API_VERSION: latest
+      CHATWOOT_ENABLED: "true"
+      CHATWOOT_MESSAGE_READ: "true"
+      CHATWOOT_MESSAGE_DELETE: "false"
+      CHATWOOT_IMPORT_PLACEHOLDER_MEDIA_MESSAGE: "true"
+    ports:
+      - "8083:8080"
+    networks:
+      - ravenna_net
+      - minio_net
+    restart: unless-stopped
+    volumes:
+      - evolution_store:/evolution/store
+      - evolution_instances:/evolution/instances
+    command: >
+      sh -c "
+      node ./dist/src/main.js
+      "
+
+volumes:
+  postgres_data:
+  redis_data:
+  evolution_store:
+  evolution_instances:
+
+networks:
+  ravenna_net:
+    external: true
+  minio_net:
+    external: true

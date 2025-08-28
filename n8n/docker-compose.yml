@@ -1,0 +1,70 @@
+version: '3.8'
+
+services:
+  n8n:
+    image: n8nio/n8n
+    container_name: n8n
+    restart: unless-stopped
+    ports:
+      - "5678:5678"
+    environment:
+      - N8N_HOST=n8n
+      - N8N_PORT=5678
+      - N8N_PROTOCOL=http
+      - N8N_BASIC_AUTH_ACTIVE=true
+      - N8N_BASIC_AUTH_USER=${N8N_BASIC_AUTH_USER}
+      - N8N_BASIC_AUTH_PASSWORD=${N8N_BASIC_AUTH_PASSWORD}
+      - GENERIC_TIMEZONE=${GENERIC_TIMEZONE}
+      - TZ=${TZ}
+      - DB_TYPE=postgresdb
+      - DB_POSTGRESDB_HOST=n8n_postgres
+      - DB_POSTGRESDB_DATABASE=${DB_POSTGRESDB_DATABASE}
+      - DB_POSTGRESDB_USER=${DB_POSTGRESDB_USER}
+      - DB_POSTGRESDB_PASSWORD=${DB_POSTGRESDB_PASSWORD}
+      - EXECUTIONS_DATA_PRUNE=true
+      - EXECUTIONS_DATA_MAX_AGE=240
+      - QUEUE_BULL_REDIS_HOST=n8n_redis
+      - QUEUE_BULL_REDIS_PORT=6379
+      - QUEUE_BULL_REDIS_PASSWORD=${QUEUE_BULL_REDIS_PASSWORD}
+      - NODE_ENV=production
+      - N8N_SECURE_COOKIE=false
+    volumes:
+      - ./local-files:/files
+      - n8n_data:/home/node/.n8n
+    networks:
+      - ravenna_net
+    depends_on:
+      - n8n_postgres
+      - n8n_redis
+
+  n8n_postgres:
+    image: postgres:15
+    container_name: n8n_postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: ${DB_POSTGRESDB_DATABASE}
+      POSTGRES_USER: ${DB_POSTGRESDB_USER}
+      POSTGRES_PASSWORD: ${DB_POSTGRESDB_PASSWORD}
+    volumes:
+      - n8n_postgres_data:/var/lib/postgresql/data
+    networks:
+      - ravenna_net
+
+  n8n_redis:
+    image: redis:7
+    container_name: n8n_redis
+    command: redis-server --appendonly yes --requirepass ${QUEUE_BULL_REDIS_PASSWORD}
+    restart: unless-stopped
+    volumes:
+      - n8n_redis_data:/data
+    networks:
+      - ravenna_net
+
+volumes:
+  n8n_data:
+  n8n_postgres_data:
+  n8n_redis_data:
+
+networks:
+  ravenna_net:
+    external: true

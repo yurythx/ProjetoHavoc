@@ -1,0 +1,3 @@
+docker network create ravenna_net
+
+docker network create minio_net

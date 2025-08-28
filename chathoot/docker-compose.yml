@@ -1,0 +1,85 @@
+version: "3.9"
+
+services:
+  postgres:
+    image: pgvector/pgvector:pg16
+    container_name: chatwoot-postgres
+    restart: always
+    environment:
+      POSTGRES_USER: ${POSTGRES_USERNAME}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DATABASE}
+    volumes:
+      - chatwoot-postgres-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USERNAME} -d ${POSTGRES_DATABASE}"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    networks:
+      - ravenna_net
+
+  redis:
+    image: redis:7
+    container_name: chatwoot-redis
+    restart: always
+    command: redis-server --requirepass ${REDIS_PASSWORD}
+    volumes:
+      - chatwoot-redis-data:/data
+    healthcheck:
+      test: ["CMD-SHELL", "redis-cli ping || exit 1"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    networks:
+      - ravenna_net
+
+  rails:
+    image: chatwoot/chatwoot:latest
+    container_name: chatwoot-rails
+    restart: always
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    env_file: .env
+    environment:
+      RAILS_ENV: production
+      NODE_ENV: production
+      INSTALLATION_ENV: docker
+    ports:
+      - "3000:3000"
+    command: >
+      sh -c "
+      bundle exec rails db:chatwoot_prepare &&
+      bundle exec rails s -b 0.0.0.0 -p 3000
+      "
+    networks:
+      - ravenna_net
+      - minio_net
+
+  sidekiq:
+    image: chatwoot/chatwoot:latest
+    container_name: chatwoot-sidekiq
+    restart: always
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    env_file: .env
+    command: bundle exec sidekiq -C config/sidekiq.yml
+    networks:
+      - ravenna_net
+      - minio_net
+
+volumes:
+  chatwoot-postgres-data:
+  chatwoot-redis-data:
+
+networks:
+  ravenna_net:
+    external: true
+  minio_net:
+    external: true
