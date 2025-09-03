@@ -1,6 +1,6 @@
-version: "3.9"
 
 services:
+  # === Postgres para o Chatwoot ===
   postgres:
     image: pgvector/pgvector:pg16
     container_name: chatwoot-postgres
@@ -19,6 +19,7 @@ services:
     networks:
       - ravenna_net
 
+  # === Redis para cache do Chatwoot ===
   redis:
     image: redis:7
     container_name: chatwoot-redis
@@ -27,13 +28,14 @@ services:
     volumes:
       - chatwoot-redis-data:/data
     healthcheck:
-      test: ["CMD-SHELL", "redis-cli ping || exit 1"]
+      test: ["CMD-SHELL", "redis-cli -a ${REDIS_PASSWORD} ping || exit 1"]
       interval: 5s
       timeout: 5s
       retries: 5
     networks:
       - ravenna_net
 
+  # === Chatwoot Rails ===
   rails:
     image: chatwoot/chatwoot:latest
     container_name: chatwoot-rails
@@ -44,21 +46,18 @@ services:
       redis:
         condition: service_healthy
     env_file: .env
-    environment:
-      RAILS_ENV: production
-      NODE_ENV: production
-      INSTALLATION_ENV: docker
     ports:
-      - "3000:3000"
+      - "3666:3000"
+    networks:
+      - ravenna_net
+      - minio_net
     command: >
       sh -c "
       bundle exec rails db:chatwoot_prepare &&
       bundle exec rails s -b 0.0.0.0 -p 3000
       "
-    networks:
-      - ravenna_net
-      - minio_net
 
+  # === Sidekiq (jobs em background) ===
   sidekiq:
     image: chatwoot/chatwoot:latest
     container_name: chatwoot-sidekiq
@@ -69,10 +68,10 @@ services:
       redis:
         condition: service_healthy
     env_file: .env
-    command: bundle exec sidekiq -C config/sidekiq.yml
     networks:
       - ravenna_net
       - minio_net
+    command: bundle exec sidekiq -C config/sidekiq.yml
 
 volumes:
   chatwoot-postgres-data:

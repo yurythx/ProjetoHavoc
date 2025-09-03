@@ -1,6 +1,6 @@
-version: '3.8'
 
 services:
+  # === Postgres da Evolution ===
   postgres_ravenna:
     image: postgres:15
     container_name: postgres_ravenna
@@ -19,12 +19,11 @@ services:
       timeout: 5s
       retries: 5
 
+  # === Redis da Evolution ===
   redis_ravenna:
     image: redis:7
     container_name: redis_ravenna
     command: redis-server --appendonly yes --requirepass ${REDIS_PASSWORD}
-    #ports:
-    #  - "6379:6379"
     volumes:
       - redis_data:/data
     networks:
@@ -36,6 +35,7 @@ services:
       timeout: 5s
       retries: 5
 
+  # === Evolution API ===
   evolution_api:
     image: evoapicloud/evolution-api:v2.3.1
     container_name: evolution_api
@@ -51,10 +51,10 @@ services:
       AUTHENTICATION_EXPOSE_IN_FETCH_INSTANCES: "true"
       DEL_INSTANCE: "false"
       LOG_LEVEL: ERROR,WARN,DEBUG,INFO,LOG,VERBOSE,DARK,WEBHOOKS
-      CONFIG_SESSION_PHONE_CLIENT: Projeto Havoc
+      CONFIG_SESSION_PHONE_CLIENT: Ravenna
       CONFIG_SESSION_PHONE_NAME: Chrome
       QRCODE_LIMIT: 5
-      DATABASE_PROVIDER: postgresql
+      DATABASE_PROVIDER: postgresql           # <--- corrigido
       DATABASE_CONNECTION_URI: postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres_ravenna:5432/${POSTGRES_DB}?schema=public
       DATABASE_CONNECTION_CLIENT_NAME: postgres
       DATABASE_SAVE_DATA_INSTANCE: "true"
